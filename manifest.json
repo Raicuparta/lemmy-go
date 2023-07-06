@@ -4,7 +4,7 @@
   "version": "1.0",
   "manifest_version": 3,
   "background": {
-    "service_worker_disable": "background.js",
+    "service_worker_disabled": "background.js",
     "scripts": [
       "background.js"
     ]
