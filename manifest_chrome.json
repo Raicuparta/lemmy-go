@@ -1,0 +1,29 @@
+{
+  "name": "Go To Lemmy Community",
+  "description": "Quickly navigate to a Lemmy community from the address bar.",
+  "version": "0.1.0",
+  "manifest_version": 3,
+  "background": {
+    "service_worker": "background.js"
+  },
+  "omnibox": {
+    "keyword": "lc"
+  },
+  "host_permissions": [
+    "https://browse.feddit.de/*"
+  ],
+  "action": {
+    "default_icon": {
+      "16": "newtab_search16.png",
+      "32": "newtab_search32.png",
+      "48": "newtab_search48.png",
+      "128": "newtab_search128.png"
+    }
+  },
+  "icons": {
+    "16": "newtab_search16.png",
+    "32": "newtab_search32.png",
+    "48": "newtab_search48.png",
+    "128": "newtab_search128.png"
+  }
+}
