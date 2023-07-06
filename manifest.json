@@ -1,10 +1,9 @@
 {
-  "name": "Lemmy Community",
-  "description": "Lemmy Community Finder",
-  "version": "1.0",
+  "name": "Go To Lemmy Community",
+  "description": "Quickly navigate to a Lemmy community from the address bar.",
+  "version": "0.1.0",
   "manifest_version": 3,
   "background": {
-    "service_worker_disabled": "background.js",
     "scripts": [
       "background.js"
     ]
@@ -28,5 +27,11 @@
     "32": "newtab_search32.png",
     "48": "newtab_search48.png",
     "128": "newtab_search128.png"
+  },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "lemmy-communities@raicuparta.com",
+      "strict_min_version": "109.0"
+    }
   }
 }
