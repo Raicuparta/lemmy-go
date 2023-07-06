@@ -110,14 +110,22 @@ chrome.omnibox.onInputChanged.addListener(async (text, suggest) => {
   }
 
   suggest(
-    filteredCommunities.map((c) => ({
-      content: c.community.actor_id,
-      description: `${c.community.title} (${c.community.name}@${c.url}, ${c.counts.subscribers} subs)`,
-    }))
+    filteredCommunities
+      // Ignore the first element, since it's gonna show as the default suggestion instead.
+      .slice(1)
+      .map((community) => ({
+        content: community.community.actor_id,
+        description: formatCommunity(community),
+      }))
   );
 
   const firstCommunity = filteredCommunities[0];
   chrome.omnibox.setDefaultSuggestion({
-    description: `${firstCommunity.community.title} (${firstCommunity.community.name}@${firstCommunity.url})`,
+    description: formatCommunity(firstCommunity),
   });
 });
+
+const formatCommunity = (community) =>
+  `${escapeXml(community.community.title)} (${community.community.name}@${
+    community.url
+  }, ${community.counts.subscribers} subs)`;
