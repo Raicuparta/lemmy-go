@@ -1,0 +1,1 @@
+# Lemmy Community Navigation
