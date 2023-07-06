@@ -1,3 +1,5 @@
+const apiUrl = "https://browse.feddit.de/communities.json";
+
 const getUrlFromText = async (text) => {
   if (text.startsWith("http")) return text;
 
@@ -23,9 +25,7 @@ chrome.omnibox.onInputEntered.addListener(async (text, disposition) => {
 let communities = [];
 
 const setUpCommunities = async () => {
-  const result = await fetch(
-    `https://browse.feddit.de/communities.json?nocache=${Math.random()}`
-  );
+  const result = await fetch(`${apiUrl}?nocache=${Math.random()}`);
   communities = (await result.json()).sort(
     (communityA, communityB) =>
       communityB.counts.subscribers - communityA.counts.subscribers
