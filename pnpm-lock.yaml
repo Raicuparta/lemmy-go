@@ -23,6 +23,9 @@ devDependencies:
   node:
     specifier: ^20.4.0
     version: 20.4.0
+  node-watch:
+    specifier: ^0.7.3
+    version: 0.7.3
 
 packages:
 
@@ -324,6 +327,11 @@ packages:
         optional: true
     dependencies:
       whatwg-url: 5.0.0
+    dev: true
+
+  /node-watch@0.7.3:
+    resolution: {integrity: sha512-3l4E8uMPY1HdMMryPRUAl+oIHtXtyiTlIiESNSVSNxcPfzAFzeTbXFQkZfAwBbo0B1qMSG8nUABx+Gd+YrbKrQ==}
+    engines: {node: '>=6'}
     dev: true
 
   /node@20.4.0:

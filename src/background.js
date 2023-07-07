@@ -2,7 +2,14 @@
  * @typedef {{ url: string } & import('lemmy-js-client').CommunityView} Community
  */
 
+/** @type {'$BUILD_TARGET_UNSET$' | 'chrome' | 'firefox'} */
+const buildTarget = "$BUILD_TARGET_UNSET$";
+
 const apiUrl = "https://browse.feddit.de/communities.json";
+
+if (buildTarget === "$BUILD_TARGET_UNSET$") {
+  throw new Error("Build target has not been set. Set it.");
+}
 
 /** @type {Community[]} */
 let communities = [];
@@ -98,7 +105,9 @@ async function getFilteredCommunities(text) {
 /**
  * @param {string} text
  */
-function escapeXml(text) {
+function escapeOmniboxString(text) {
+  if (buildTarget === "firefox") return text;
+
   return text.replace(/[<>&'"]/g, function (c) {
     switch (c) {
       case "<":
@@ -152,6 +161,8 @@ chrome.omnibox.onInputChanged.addListener(async (text, suggest) => {
  * @param {Community} community
  */
 const formatCommunity = (community) =>
-  `${escapeXml(community.community.title)} (${community.community.name}@${
-    community.url
-  }, ${community.counts.subscribers} subs)`;
+  `${escapeOmniboxString(community.community.title)} (${
+    community.community.name
+  }@${community.url}, ${community.counts.subscribers} subs)`;
+
+console.log("info", chrome.runtime.getPlatformInfo());

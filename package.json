@@ -7,9 +7,14 @@
   "author": "Raicuparta",
   "license": "MIT",
   "scripts": {
-    "build": "pnpm run build-chrome && pnpm run build-firefox",
-    "build-chrome": "node build.mjs chrome",
-    "build-firefox": "node build.mjs firefox"
+    "build": "pnpm run build-chrome & pnpm run build-firefox",
+    "watch": "pnpm run watch-chrome & pnpm run watch-firefox",
+    "build-chrome": "pnpm run _build-zip chrome",
+    "build-firefox": "pnpm run _build-zip firefox",
+    "watch-chrome": "pnpm run _watch chrome",
+    "watch-firefox": "pnpm run _watch firefox",
+    "_build-zip": "node build-scripts/run-build-zip.mjs",
+    "_watch": "node build-scripts/run-watch.mjs"
   },
   "devDependencies": {
     "@types/archiver": "^5.3.2",
@@ -17,6 +22,7 @@
     "@types/node": "^20.4.0",
     "archiver": "^5.3.1",
     "lemmy-js-client": "^0.18.1",
-    "node": "^20.4.0"
+    "node": "^20.4.0",
+    "node-watch": "^0.7.3"
   }
 }
