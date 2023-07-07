@@ -35,4 +35,4 @@ if (fs.existsSync(buildFolder)) {
 fs.cpSync(__dirname + "/src", buildFolder, { recursive: true });
 fs.cpSync(manifest, buildFolder + "/manifest.json");
 
-await zipDirectory(buildFolder, "build.zip");
+await zipDirectory(buildFolder, `${buildFolder}.zip`);
