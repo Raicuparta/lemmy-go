@@ -23,21 +23,11 @@ async function getUrlFromText(text) {
   return (await getFilteredCommunities(text))[0]?.community.actor_id;
 }
 
-chrome.omnibox.onInputEntered.addListener(async (text, disposition) => {
-  const url = await getUrlFromText(text);
-
-  switch (disposition) {
-    case "currentTab":
-      chrome.tabs.update({ url });
-      break;
-    case "newForegroundTab":
-      chrome.tabs.create({ url });
-      break;
-    case "newBackgroundTab":
-      chrome.tabs.create({ url, active: false });
-      break;
-  }
-});
+function setUpInitialText() {
+  chrome.omnibox.setDefaultSuggestion({
+    description: "Type the name of the Lemmy community you want to find",
+  });
+}
 
 async function setUpCommunities() {
   const result = await fetch(`${apiUrl}?nocache=${Math.random()}`);
@@ -51,16 +41,13 @@ async function setUpCommunities() {
   );
 }
 
-function setUpInitialText() {
-  chrome.omnibox.setDefaultSuggestion({
-    description: "Type the name of the Lemmy community you want to find",
-  });
-}
-
-chrome.omnibox.onInputStarted.addListener(() => {
-  setUpInitialText();
-  setUpCommunities();
-});
+/**
+ * @param {Community} community
+ */
+const formatCommunity = (community) =>
+  `${escapeOmniboxString(community.community.title)} (${
+    community.community.name
+  }@${community.url}, ${community.counts.subscribers} subs)`;
 
 /**
  * @param {string} text
@@ -106,6 +93,8 @@ async function getFilteredCommunities(text) {
  * @param {string} text
  */
 function escapeOmniboxString(text) {
+  // In Chrome, the omnibox suggestions are XML. That means we need to escape certain characters there.
+  // In Firefox, the omnibox suggestions are plain text. That means we can't escape those same characters.
   if (buildTarget === "firefox") return text;
 
   return text.replace(/[<>&'"]/g, function (c) {
@@ -125,6 +114,11 @@ function escapeOmniboxString(text) {
     }
   });
 }
+
+chrome.omnibox.onInputStarted.addListener(() => {
+  setUpInitialText();
+  setUpCommunities();
+});
 
 chrome.omnibox.onInputChanged.addListener(async (text, suggest) => {
   if (!text) {
@@ -157,12 +151,18 @@ chrome.omnibox.onInputChanged.addListener(async (text, suggest) => {
   });
 });
 
-/**
- * @param {Community} community
- */
-const formatCommunity = (community) =>
-  `${escapeOmniboxString(community.community.title)} (${
-    community.community.name
-  }@${community.url}, ${community.counts.subscribers} subs)`;
+chrome.omnibox.onInputEntered.addListener(async (text, disposition) => {
+  const url = await getUrlFromText(text);
 
-console.log("info", chrome.runtime.getPlatformInfo());
+  switch (disposition) {
+    case "currentTab":
+      chrome.tabs.update({ url });
+      break;
+    case "newForegroundTab":
+      chrome.tabs.create({ url });
+      break;
+    case "newBackgroundTab":
+      chrome.tabs.create({ url, active: false });
+      break;
+  }
+});
