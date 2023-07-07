@@ -1,0 +1,13 @@
+{
+  "name": "go-to-lemmy-community",
+  "version": "0.1.0",
+  "description": "",
+  "main": "background.js",
+  "keywords": [],
+  "author": "Raicuparta",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/chrome": "^0.0.240",
+    "lemmy-js-client": "^0.18.1"
+  }
+}

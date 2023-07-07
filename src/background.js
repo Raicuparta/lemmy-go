@@ -1,5 +1,12 @@
+/**
+ * @typedef {{ url: string } & import('lemmy-js-client').CommunityView} Community
+ */
+
 const apiUrl = "https://browse.feddit.de/communities.json";
 
+/**
+ * @param {string} text
+ */
 const getUrlFromText = async (text) => {
   if (text.startsWith("http")) return text;
 
@@ -22,6 +29,9 @@ chrome.omnibox.onInputEntered.addListener(async (text, disposition) => {
   }
 });
 
+/**
+ * @type {Community[]}
+ */
 let communities = [];
 
 const setUpCommunities = async () => {
@@ -54,6 +64,9 @@ const matches = (text, searchTerm) => {
   return normalizedText.includes(normalizedSearchTerm);
 };
 
+/**
+ * @param {string} text
+ */
 const getCommunity = async (text) => {
   if (communities.length === 0) {
     await setUpCommunities();
@@ -77,8 +90,11 @@ const getCommunities = async (text) => {
   );
 };
 
-function escapeXml(unsafe) {
-  return unsafe.replace(/[<>&'"]/g, function (c) {
+/**
+ * @param {string} text
+ */
+function escapeXml(text) {
+  return text.replace(/[<>&'"]/g, function (c) {
     switch (c) {
       case "<":
         return "&lt;";
@@ -90,6 +106,8 @@ function escapeXml(unsafe) {
         return "&apos;";
       case '"':
         return "&quot;";
+      default:
+        return "";
     }
   });
 }
@@ -125,6 +143,9 @@ chrome.omnibox.onInputChanged.addListener(async (text, suggest) => {
   });
 });
 
+/**
+ * @param {Community} community
+ */
 const formatCommunity = (community) =>
   `${escapeXml(community.community.title)} (${community.community.name}@${
     community.url
