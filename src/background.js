@@ -4,14 +4,17 @@
 
 const apiUrl = "https://browse.feddit.de/communities.json";
 
+/** @type {Community[]} */
+let communities = [];
+
 /**
  * @param {string} text
  */
-const getUrlFromText = async (text) => {
+async function getUrlFromText(text) {
   if (text.startsWith("http")) return text;
 
-  return (await getCommunities(text))[0]?.community.actor_id;
-};
+  return (await getFilteredCommunities(text))[0]?.community.actor_id;
+}
 
 chrome.omnibox.onInputEntered.addListener(async (text, disposition) => {
   const url = await getUrlFromText(text);
@@ -29,24 +32,23 @@ chrome.omnibox.onInputEntered.addListener(async (text, disposition) => {
   }
 });
 
-/**
- * @type {Community[]}
- */
-let communities = [];
-
-const setUpCommunities = async () => {
+async function setUpCommunities() {
   const result = await fetch(`${apiUrl}?nocache=${Math.random()}`);
-  communities = (await result.json()).sort(
+
+  /** @type {Community[]} */
+  const communitiesJson = await result.json();
+
+  communities = communitiesJson.sort(
     (communityA, communityB) =>
       communityB.counts.subscribers - communityA.counts.subscribers
   );
-};
+}
 
-const setUpInitialText = () => {
+function setUpInitialText() {
   chrome.omnibox.setDefaultSuggestion({
     description: "Type the name of the Lemmy community you want to find",
   });
-};
+}
 
 chrome.omnibox.onInputStarted.addListener(() => {
   setUpInitialText();
@@ -57,17 +59,17 @@ chrome.omnibox.onInputStarted.addListener(() => {
  * @param {string} text
  * @param {string} searchTerm
  */
-const matches = (text, searchTerm) => {
+function matches(text, searchTerm) {
   const normalizedText = text.toLocaleLowerCase();
   const normalizedSearchTerm = searchTerm.toLocaleLowerCase();
 
   return normalizedText.includes(normalizedSearchTerm);
-};
+}
 
 /**
  * @param {string} text
  */
-const getCommunity = async (text) => {
+async function getCommunity(text) {
   if (communities.length === 0) {
     await setUpCommunities();
   }
@@ -75,9 +77,12 @@ const getCommunity = async (text) => {
     ({ community }) =>
       matches(community.name, text) || matches(community.title, text)
   );
-};
+}
 
-const getCommunities = async (text) => {
+/**
+ * @param {string} text
+ */
+async function getFilteredCommunities(text) {
   if (communities.length === 0) {
     chrome.omnibox.setDefaultSuggestion({
       description: `Looking for Lemmy communities...`,
@@ -88,7 +93,7 @@ const getCommunities = async (text) => {
     ({ community }) =>
       matches(community.name, text) || matches(community.title, text)
   );
-};
+}
 
 /**
  * @param {string} text
@@ -118,7 +123,7 @@ chrome.omnibox.onInputChanged.addListener(async (text, suggest) => {
     return;
   }
 
-  const filteredCommunities = await getCommunities(text);
+  const filteredCommunities = await getFilteredCommunities(text);
 
   if (filteredCommunities.length === 0) {
     chrome.omnibox.setDefaultSuggestion({
