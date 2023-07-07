@@ -6,8 +6,17 @@
   "keywords": [],
   "author": "Raicuparta",
   "license": "MIT",
+  "scripts": {
+    "build": "pnpm run build-chrome && pnpm run build-firefox",
+    "build-chrome": "node build.mjs chrome",
+    "build-firefox": "node build.mjs firefox"
+  },
   "devDependencies": {
+    "@types/archiver": "^5.3.2",
     "@types/chrome": "^0.0.240",
-    "lemmy-js-client": "^0.18.1"
+    "@types/node": "^20.4.0",
+    "archiver": "^5.3.1",
+    "lemmy-js-client": "^0.18.1",
+    "node": "^20.4.0"
   }
 }
