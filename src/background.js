@@ -78,14 +78,19 @@ async function getCommunity(text) {
  */
 async function getFilteredCommunities(text) {
   if (communities.length === 0) {
-    chrome.omnibox.setDefaultSuggestion({
-      description: `Looking for Lemmy communities...`,
-    });
     await setUpCommunities();
   }
-  return communities.filter(
-    ({ community }) =>
-      matches(community.name, text) || matches(community.title, text)
+
+  return (
+    communities
+      // Negative score means no match.
+      .filter((community) => score(community, text) >= 0)
+      // Lower positive score means closer match.
+      .sort(
+        (communityA, communityB) =>
+          score(communityA, text) - score(communityB, text)
+      )
+      .slice(0, 10)
   );
 }
 
@@ -115,6 +120,26 @@ function escapeOmniboxString(text) {
   });
 }
 
+const array = [];
+const characterCodeCache = [];
+
+/**
+ * @param {Community} community
+ * @param {string} query
+ */
+function score({ community }, query) {
+  const name = community.name.toLowerCase();
+  const title = community.title.toLowerCase();
+  const normalizedQuery = query.toLocaleLowerCase();
+
+  if (name === normalizedQuery) return 0;
+  if (title === normalizedQuery) return 1;
+  if (name.includes(normalizedQuery)) return 2;
+  if (title.includes(normalizedQuery)) return 3;
+
+  return -1;
+}
+
 chrome.omnibox.onInputStarted.addListener(() => {
   setUpInitialText();
   setUpCommunities();
@@ -136,19 +161,11 @@ chrome.omnibox.onInputChanged.addListener(async (text, suggest) => {
   }
 
   suggest(
-    filteredCommunities
-      // Ignore the first element, since it's gonna show as the default suggestion instead.
-      .slice(1)
-      .map((community) => ({
-        content: community.community.actor_id,
-        description: formatCommunity(community),
-      }))
+    filteredCommunities.map((community) => ({
+      content: community.community.actor_id,
+      description: formatCommunity(community),
+    }))
   );
-
-  const firstCommunity = filteredCommunities[0];
-  chrome.omnibox.setDefaultSuggestion({
-    description: formatCommunity(firstCommunity),
-  });
 });
 
 chrome.omnibox.onInputEntered.addListener(async (text, disposition) => {
