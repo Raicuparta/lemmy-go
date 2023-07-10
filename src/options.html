@@ -6,16 +6,17 @@
   <style>
     body {
       font-family: sans-serif;
+      font-size: 11px;
       margin: 0;
       display: flex;
       flex-direction: column;
       gap: 10px;
-      max-width: 350px;
+      width: 300px;
       background: #efeaf8;
     }
     h1 {
       margin: 0;
-      font-size: 1.5rem;
+      font-size: 1.2rem;
     }
     main {
       padding: 0 10px;
@@ -29,14 +30,16 @@
       color: #3c2c58;
       padding: 10px;
       display: flex;
-      font-size: 10px;
+      font-size: 0.6rem;
       gap: 10px;
+      opacity: 80%;
     }
     footer {
       justify-content: space-between;
     }
     header {
       justify-content: center;
+      align-items: center;
     }
     .button {
       text-decoration: none;
@@ -49,6 +52,7 @@
       gap: 5px;
       border: 0;
       cursor: pointer;
+      justify-content: center;
     }
     .button:hover {
       background-color: #49356b;
@@ -59,13 +63,16 @@
     .help {
       background-color: #3c2c58;
       color: white;
-      font-size: 12px;
       font-weight: bold;
-      padding: 7px;
       margin: 3px;
       display: inline-block;
       line-height: 5px;
       border-radius: 100%;
+      height: 15px;
+      width: 15px;
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
     }
     .help:hover {
       background-color: #49356b;
@@ -94,7 +101,7 @@
 
   <body>
     <header>
-      <img src="icon.png" width="32" height="32" />
+      <img src="icon.png" width="20" height="20" />
       <h1>Lemmy Go</h1>
     </header>
     <main>
