@@ -6,8 +6,7 @@
 const buildTarget = "$BUILD_TARGET_UNSET$";
 
 const apiUrl = "https://lemmy.raicuparta.com/communities.json";
-
-const instance = "lemmy.world";
+const fallbackInstanceDomain = "lemmy.ml";
 
 if (buildTarget === "$BUILD_TARGET_UNSET$") {
   throw new Error("Build target has not been set. Set it.");
@@ -16,13 +15,34 @@ if (buildTarget === "$BUILD_TARGET_UNSET$") {
 /** @type {Community[]} */
 let communities = [];
 
+/** @type {{ showNsfw: boolean, instanceDomain: string } | undefined} */
+let storage;
+
 /**
  * @param {string} text
  */
 async function getUrlFromText(text) {
   if (text.startsWith("http")) return text;
 
-  return (await getFilteredCommunities(text))[0]?.url;
+  const firstCommunity = (await getFilteredCommunities(text))[0];
+
+  if (firstCommunity) {
+    return getCommunityUrl((await getFilteredCommunities(text))[0]);
+  }
+
+  return `${getPreferredInstanceUrl}/search?q=${encodeURIComponent(
+    text
+  )}&type=Communities`;
+}
+
+function getPreferredInstanceUrl() {
+  const instanceDomain = (
+    storage?.instanceDomain || fallbackInstanceDomain
+  ).trim();
+
+  return `https://${
+    instanceDomain.endsWith("/") ? instanceDomain.slice(0, -1) : instanceDomain
+  }`;
 }
 
 function setUpInitialText() {
@@ -102,6 +122,13 @@ async function getFilteredCommunities(text) {
   );
 }
 
+/** @param {Community} community */
+function getCommunityUrl(community) {
+  return storage?.instanceDomain
+    ? `${getPreferredInstanceUrl()}/c/${community.name}@${community.domain}`
+    : community.url;
+}
+
 /**
  * @param {string} text
  */
@@ -148,9 +175,10 @@ function score(community, query) {
   return -1;
 }
 
-chrome.omnibox.onInputStarted.addListener(() => {
+chrome.omnibox.onInputStarted.addListener(async () => {
   setUpInitialText();
   setUpCommunities();
+  storage = await chrome.storage.sync.get(["showNsfw", "instanceDomain"]);
 });
 
 chrome.omnibox.onInputChanged.addListener(async (text, suggest) => {
@@ -170,7 +198,7 @@ chrome.omnibox.onInputChanged.addListener(async (text, suggest) => {
 
   suggest(
     filteredCommunities.map((community) => ({
-      content: `https://${instance}/c/${community.name}@${community.domain}`,
+      content: getCommunityUrl(community),
       description: formatCommunity(community),
     }))
   );
