@@ -137,7 +137,7 @@ function getCommunityId(community) {
 
 /** @param {Community} community */
 function getCommunityUrl(community) {
-  return storage?.instanceDomain
+  return storage?.instanceDomain && storage.instanceDomain !== community.domain
     ? `${getPreferredInstanceUrl()}/c/${getCommunityId(community)}`
     : community.url;
 }
