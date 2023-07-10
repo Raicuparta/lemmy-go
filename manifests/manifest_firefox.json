@@ -12,7 +12,7 @@
     "keyword": "lc"
   },
   "host_permissions": [
-    "https://browse.feddit.de/*"
+    "https://lemmy.raicuparta.com/*"
   ],
   "action": {
     "default_icon": {

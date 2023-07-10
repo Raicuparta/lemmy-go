@@ -1,11 +1,11 @@
 /**
- * @typedef {{ url: string } & import('lemmy-js-client').CommunityView} Community
+ * @typedef {{ url: string, subscribers: number, monthlyActiveUsers: number, domain: string, nsfw: boolean, name: string, title: string }} Community
  */
 
 /** @type {'$BUILD_TARGET_UNSET$' | 'chrome' | 'firefox'} */
 const buildTarget = "$BUILD_TARGET_UNSET$";
 
-const apiUrl = "https://browse.feddit.de/communities.json";
+const apiUrl = "https://lemmy.raicuparta.com/communities.json";
 
 if (buildTarget === "$BUILD_TARGET_UNSET$") {
   throw new Error("Build target has not been set. Set it.");
@@ -20,7 +20,7 @@ let communities = [];
 async function getUrlFromText(text) {
   if (text.startsWith("http")) return text;
 
-  return (await getFilteredCommunities(text))[0]?.community.actor_id;
+  return (await getFilteredCommunities(text))[0]?.url;
 }
 
 function setUpInitialText() {
@@ -36,8 +36,7 @@ async function setUpCommunities() {
   const communitiesJson = await result.json();
 
   communities = communitiesJson.sort(
-    (communityA, communityB) =>
-      communityB.counts.subscribers - communityA.counts.subscribers
+    (communityA, communityB) => communityB.subscribers - communityA.subscribers
   );
 }
 
@@ -45,9 +44,9 @@ async function setUpCommunities() {
  * @param {Community} community
  */
 const formatCommunity = (community) =>
-  `${escapeOmniboxString(community.community.title)} (${
-    community.community.name
-  }@${community.url}, ${community.counts.subscribers} subs)`;
+  `${escapeOmniboxString(community.title)} (${community.name}@${
+    community.domain
+  }, ${community.subscribers} subs)`;
 
 /**
  * @param {string} text
@@ -68,7 +67,7 @@ async function getCommunity(text) {
     await setUpCommunities();
   }
   return communities.find(
-    ({ community }) =>
+    (community) =>
       matches(community.name, text) || matches(community.title, text)
   );
 }
@@ -127,7 +126,7 @@ const characterCodeCache = [];
  * @param {Community} community
  * @param {string} query
  */
-function score({ community }, query) {
+function score(community, query) {
   const name = community.name.toLowerCase();
   const title = community.title.toLowerCase();
   const normalizedQuery = query.toLocaleLowerCase();
@@ -162,7 +161,7 @@ chrome.omnibox.onInputChanged.addListener(async (text, suggest) => {
 
   suggest(
     filteredCommunities.map((community) => ({
-      content: community.community.actor_id,
+      content: community.url,
       description: formatCommunity(community),
     }))
   );
