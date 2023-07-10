@@ -16,9 +16,6 @@
     h1 {
       margin: 0;
       font-size: 1.5rem;
-      white-space: nowrap;
-      text-align: center;
-      width: 100%;
     }
     main {
       padding: 0 10px;
@@ -32,8 +29,14 @@
       color: #3c2c58;
       padding: 10px;
       display: flex;
-      justify-content: space-between;
       font-size: 10px;
+      gap: 10px;
+    }
+    footer {
+      justify-content: space-between;
+    }
+    header {
+      justify-content: center;
     }
     .button {
       text-decoration: none;
@@ -41,7 +44,9 @@
       background-color: #3c2c58;
       padding: 5px 10px;
       border-radius: 5px;
-      display: inline-block;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
       border: 0;
       cursor: pointer;
     }
@@ -81,33 +86,38 @@
       flex: 0;
       opacity: 80%;
     }
+    .raicuparta-icon {
+      width: 16px;
+      height: 16px;
+    }
   </style>
 
   <body>
     <header>
-      <h1>Go To Lemmy Community</h1>
+      <img src="icon.png" width="32" height="32" />
+      <h1>Lemmy Go</h1>
     </header>
     <main>
-        <div class="text-input-wrapper">
-          <label for="domain-input">
-            Instance domain
-            <span
-              class="help"
-              title="Will try to navigate to the community in this instance. Will fail if your instance blocks the selected community's instance."
-            >
-              ?
-            </span>
-          </label>
-          <input id="domain-input"></input>
-        </div>
-        <span>
-          <input id="nsfw-checkbox" type="checkbox" />
-          <label for="nsfw-checkbox">Show communities marked as NSFW</label>
-        </span>
-        <div class="form-buttons">
-          <button id="save-button" class="save-button button">Save</button>
-          <button id="reset-button" class="reset-button button">Reset</button>
-        </div>
+      <div class="text-input-wrapper">
+        <label for="domain-input">
+          Instance domain
+          <span
+            class="help"
+            title="Will try to navigate to the community in this instance. Will fail if your instance blocks the selected community's instance."
+          >
+            ?
+          </span>
+        </label>
+        <input id="domain-input" />
+      </div>
+      <span>
+        <input id="nsfw-checkbox" type="checkbox" />
+        <label for="nsfw-checkbox">Show communities marked as NSFW</label>
+      </span>
+      <div class="form-buttons">
+        <button id="save-button" class="save-button button">Save</button>
+        <button id="reset-button" class="reset-button button">Reset</button>
+      </div>
     </main>
     <footer>
       <a
@@ -116,7 +126,8 @@
         target="_blank"
         rel="noreferrer"
       >
-        by Raicuparta 🧔🏻‍♂️
+        <img class="raicuparta-icon" src="./raicuparta.png" />
+        <span>by Raicuparta</span>
       </a>
       <a
         class="button"
@@ -124,7 +135,8 @@
         target="_blank"
         rel="noreferrer"
       >
-        Donate 💸
+        <span>💸</span>
+        <span>Donate</span>
       </a>
     </footer>
     <script src="./options.js"></script>
