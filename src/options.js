@@ -2,9 +2,42 @@ const nsfwCheckbox = document.getElementById("nsfw-checkbox");
 const domainInput = document.getElementById("domain-input");
 const saveButton = document.getElementById("save-button");
 const resetButton = document.getElementById("reset-button");
+const statusText = document.getElementById("status-text");
+
+/**
+ * @param {string} text
+ */
+function setStatus(text) {
+  if (!statusText) {
+    throw new Error("Couldn't find status text element");
+  }
+  statusText.innerText = text;
+}
 
 if (saveButton) {
-  saveButton.onclick = () => {
+  saveButton.onclick = async () => {
+    setStatus("Validating instance...");
+
+    const domain = domainInput?.value?.trim() || undefined;
+
+    if (domain) {
+      try {
+        /** @type {import('lemmy-js-client').GetFederatedInstancesResponse} */
+        const instances = await (
+          await fetch(`https://${domain}/api/v3/federated_instances`)
+        ).json();
+
+        setStatus(
+          instances.federated_instances?.blocked
+            .map((instance) => instance.domain)
+            .join(", ") ?? "empty"
+        );
+      } catch (error) {
+        setStatus(`Error validating this instance domain: ${error}`);
+        return;
+      }
+    }
+
     chrome.storage.sync.set({
       showNsfw: nsfwCheckbox && nsfwCheckbox.checked,
       instanceDomain: domainInput?.value?.trim() || undefined,
