@@ -3,12 +3,62 @@
   <head>
     <meta charset="utf-8" />
   </head>
+  <style>
+    body {
+      font-family: sans-serif;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    h1 {
+      margin: 0;
+      font-size: 1.5rem;
+      white-space: nowrap;
+    }
+    main {
+      padding: 10px;
+    }
+    header,
+    footer {
+      background-color: #c7b4e9;
+      color: #3c2c58;
+      padding: 10px;
+    }
+    .button {
+      text-decoration: none;
+      color: white;
+      background-color: #3c2c58;
+      padding: 5px 10px;
+      border-radius: 5px;
+      display: inline-block;
+    }
+    .button:hover {
+      background-color: #49356b;
+    }
+    .button:active {
+      background-color: #2e2144;
+    }
+  </style>
 
   <body>
-    <input id="nsfw-checkbox" type="checkbox" /><label for="nsfw-checkbox"
-      >Show communities marked as NSFW</label
-    >
-
+    <header>
+      <h1>Go To Lemmy Community</h1>
+    </header>
+    <main>
+      <input id="nsfw-checkbox" type="checkbox" />
+      <label for="nsfw-checkbox">Show communities marked as NSFW</label>
+    </main>
+    <footer>
+      <a
+        class="button"
+        href="https://paypal.me/raicuparta/5usd"
+        target="_blank"
+        rel="noreferrer"
+      >
+        Donate 💸
+      </a>
+    </footer>
     <script src="./options.js"></script>
   </body>
 </html>

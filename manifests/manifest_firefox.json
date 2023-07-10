@@ -23,7 +23,8 @@
       "32": "newtab_search32.png",
       "48": "newtab_search48.png",
       "128": "newtab_search128.png"
-    }
+    },
+    "default_popup": "options.html"
   },
   "options_ui": {
     "page": "options.html"
