@@ -189,3 +189,7 @@ chrome.omnibox.onInputEntered.addListener(async (text, disposition) => {
       break;
   }
 });
+
+chrome.action.onClicked.addListener(function () {
+  chrome.runtime.openOptionsPage();
+});
