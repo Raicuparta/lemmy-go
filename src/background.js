@@ -22,7 +22,15 @@ let storage;
  * @param {string} text
  */
 async function getUrlFromText(text) {
-  if (text.startsWith("http")) return text;
+  const [name, domain] = text.split("@");
+
+  if (domain) {
+    if (storage?.instanceDomain && storage.instanceDomain !== domain) {
+      return `https://${storage.instanceDomain}/c/${name}@${domain}`;
+    } else {
+      return `https://${domain}/c/${name}`;
+    }
+  }
 
   const firstCommunity = (await getFilteredCommunities(text))[0];
 
@@ -30,7 +38,7 @@ async function getUrlFromText(text) {
     return getCommunityUrl((await getFilteredCommunities(text))[0]);
   }
 
-  return `${getPreferredInstanceUrl}/search?q=${encodeURIComponent(
+  return `${getPreferredInstanceUrl()}/search?q=${encodeURIComponent(
     text
   )}&type=Communities`;
 }
@@ -66,7 +74,7 @@ async function setUpCommunities() {
  * @param {Community} community
  */
 const formatCommunity = (community) =>
-  `${escapeOmniboxString(community.title)} (${getFullCommunityId(community)}, ${
+  `${escapeOmniboxString(community.title)} (${getCommunityId(community)}, ${
     community.subscribers
   } subs)`;
 
@@ -123,14 +131,14 @@ async function getFilteredCommunities(text) {
 }
 
 /** @param {Community} community */
-function getFullCommunityId(community) {
+function getCommunityId(community) {
   return `${community.name}@${community.domain}`;
 }
 
 /** @param {Community} community */
 function getCommunityUrl(community) {
   return storage?.instanceDomain
-    ? `${getPreferredInstanceUrl()}/c/${getFullCommunityId(community)}`
+    ? `${getPreferredInstanceUrl()}/c/${getCommunityId(community)}`
     : community.url;
 }
 
@@ -164,18 +172,28 @@ const array = [];
 const characterCodeCache = [];
 
 /**
+ * @param {string} text
+ */
+function normalizeText(text) {
+  return text.toLowerCase().replaceAll(" ", "");
+}
+
+/**
  * @param {Community} community
  * @param {string} query
  */
 function score(community, query) {
-  const name = community.name.toLowerCase();
-  const title = community.title.toLowerCase();
-  const normalizedQuery = query.toLocaleLowerCase();
+  const id = getCommunityId(community);
+  const name = normalizeText(community.name);
+  const title = normalizeText(community.title);
+  const normalizedQuery = normalizeText(query);
 
-  if (name === normalizedQuery) return 0;
-  if (title === normalizedQuery) return 1;
-  if (name.includes(normalizedQuery)) return 2;
-  if (title.includes(normalizedQuery)) return 3;
+  if (id === normalizedQuery) return 0;
+  if (normalizedQuery.includes("@") && id.includes(normalizedQuery)) return 1;
+  if (name === normalizedQuery) return 2;
+  if (title === normalizedQuery) return 3;
+  if (name.includes(normalizedQuery)) return 4;
+  if (title.includes(normalizedQuery)) return 5;
 
   return -1;
 }
@@ -203,7 +221,7 @@ chrome.omnibox.onInputChanged.addListener(async (text, suggest) => {
 
   suggest(
     filteredCommunities.map((community) => ({
-      content: getCommunityUrl(community),
+      content: getCommunityId(community),
       description: formatCommunity(community),
     }))
   );
