@@ -11,15 +11,17 @@
       flex-direction: column;
       gap: 10px;
       max-width: 350px;
+      background: #efeaf8;
     }
     h1 {
       margin: 0;
       font-size: 1.5rem;
       white-space: nowrap;
       text-align: center;
+      width: 100%;
     }
-    form {
-      padding: 10px;
+    main {
+      padding: 0 10px;
       display: flex;
       flex-direction: column;
       gap: 10px;
@@ -63,6 +65,22 @@
     .help:hover {
       background-color: #49356b;
     }
+    .text-input-wrapper {
+      display: flex;
+      flex-direction: column;
+    }
+    .form-buttons {
+      margin-top: 10px;
+      display: flex;
+      gap: 10px;
+    }
+    .save-button {
+      flex: 1;
+    }
+    .reset-button {
+      flex: 0;
+      opacity: 80%;
+    }
   </style>
 
   <body>
@@ -70,26 +88,26 @@
       <h1>Go To Lemmy Community</h1>
     </header>
     <main>
-      <form id="settings-form">
-        <span>
-          <div>
-            <label for="domain-input"
-              >Instance domain
-              <span
-                class="help"
-                title="Will try to navigate to the community in this instance. Will fail if your instance blocks the selected community's instance."
-                >?</span
-              ></label
+        <div class="text-input-wrapper">
+          <label for="domain-input">
+            Instance domain
+            <span
+              class="help"
+              title="Will try to navigate to the community in this instance. Will fail if your instance blocks the selected community's instance."
             >
-            <input id="domain-input" placeholder="None" />
-          </div>
-        </span>
+              ?
+            </span>
+          </label>
+          <input id="domain-input"></input>
+        </div>
         <span>
           <input id="nsfw-checkbox" type="checkbox" />
           <label for="nsfw-checkbox">Show communities marked as NSFW</label>
         </span>
-        <button class="button" type="submit">Save</button>
-      </form>
+        <div class="form-buttons">
+          <button id="save-button" class="save-button button">Save</button>
+          <button id="reset-button" class="reset-button button">Reset</button>
+        </div>
     </main>
     <footer>
       <a

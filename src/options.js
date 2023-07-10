@@ -1,17 +1,28 @@
-const settingsForm = document.getElementById("settings-form");
 const nsfwCheckbox = document.getElementById("nsfw-checkbox");
 const domainInput = document.getElementById("domain-input");
+const saveButton = document.getElementById("save-button");
+const resetButton = document.getElementById("reset-button");
 
-if (settingsForm) {
-  settingsForm.onsubmit = (event) => {
-    event.preventDefault();
+if (saveButton) {
+  saveButton.onclick = () => {
     chrome.storage.sync.set({
       showNsfw: nsfwCheckbox && nsfwCheckbox.checked,
       instanceDomain: domainInput
-        ? domainInput.value || domainInput.placeholder
+        ? (domainInput.value || domainInput.placeholder).trim()
         : undefined,
     });
   };
+} else {
+  console.error("Failed to find save button");
+}
+
+if (resetButton) {
+  resetButton.onclick = async () => {
+    chrome.storage.sync.clear();
+    restore();
+  };
+} else {
+  console.error("Failed to find reset button");
 }
 
 async function restore() {
@@ -19,8 +30,8 @@ async function restore() {
   if (nsfwCheckbox) {
     nsfwCheckbox.checked = storage.showNsfw;
   }
-  if (domainInput && storage.instanceDomain) {
-    domainInput.placeholder = storage.instanceDomain;
+  if (domainInput) {
+    domainInput.placeholder = storage.instanceDomain ?? "None";
   }
 }
 
