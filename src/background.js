@@ -80,10 +80,17 @@ async function getFilteredCommunities(text) {
     await setUpCommunities();
   }
 
+  const showNsfw = (await chrome.storage.sync.get("showNsfw")).showNsfw;
+
   return (
     communities
-      // Negative score means no match.
-      .filter((community) => score(community, text) >= 0)
+      .filter(
+        (community) =>
+          // Negative score means no match.
+          score(community, text) >= 0 &&
+          // Filter out NSFW communities depending on user setting.
+          (showNsfw || !community.nsfw)
+      )
       // Lower positive score means closer match.
       .sort(
         (communityA, communityB) =>
