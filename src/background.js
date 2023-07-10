@@ -66,9 +66,9 @@ async function setUpCommunities() {
  * @param {Community} community
  */
 const formatCommunity = (community) =>
-  `${escapeOmniboxString(community.title)} (${community.name}@${
-    community.domain
-  }, ${community.subscribers} subs)`;
+  `${escapeOmniboxString(community.title)} (${getFullCommunityId(community)}, ${
+    community.subscribers
+  } subs)`;
 
 /**
  * @param {string} text
@@ -123,9 +123,14 @@ async function getFilteredCommunities(text) {
 }
 
 /** @param {Community} community */
+function getFullCommunityId(community) {
+  return `${community.name}@${community.domain}`;
+}
+
+/** @param {Community} community */
 function getCommunityUrl(community) {
   return storage?.instanceDomain
-    ? `${getPreferredInstanceUrl()}/c/${community.name}@${community.domain}`
+    ? `${getPreferredInstanceUrl()}/c/${getFullCommunityId(community)}`
     : community.url;
 }
 

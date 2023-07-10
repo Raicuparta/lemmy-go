@@ -7,9 +7,7 @@ if (saveButton) {
   saveButton.onclick = () => {
     chrome.storage.sync.set({
       showNsfw: nsfwCheckbox && nsfwCheckbox.checked,
-      instanceDomain: domainInput
-        ? (domainInput.value || domainInput.placeholder).trim()
-        : undefined,
+      instanceDomain: domainInput?.value?.trim() || undefined,
     });
   };
 } else {
@@ -31,7 +29,7 @@ async function restore() {
     nsfwCheckbox.checked = storage.showNsfw;
   }
   if (domainInput) {
-    domainInput.placeholder = storage.instanceDomain ?? "None";
+    domainInput.value = storage.instanceDomain ?? "";
   }
 }
 
