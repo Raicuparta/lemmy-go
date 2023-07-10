@@ -9,9 +9,6 @@
   "omnibox": {
     "keyword": "lc"
   },
-  "host_permissions": [
-    "https://lemmy.raicuparta.com/*"
-  ],
   "permissions": [
     "storage"
   ],
