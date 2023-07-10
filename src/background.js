@@ -7,6 +7,8 @@ const buildTarget = "$BUILD_TARGET_UNSET$";
 
 const apiUrl = "https://lemmy.raicuparta.com/communities.json";
 
+const instance = "lemmy.world";
+
 if (buildTarget === "$BUILD_TARGET_UNSET$") {
   throw new Error("Build target has not been set. Set it.");
 }
@@ -168,7 +170,7 @@ chrome.omnibox.onInputChanged.addListener(async (text, suggest) => {
 
   suggest(
     filteredCommunities.map((community) => ({
-      content: community.url,
+      content: `https://${instance}/c/${community.name}@${community.domain}`,
       description: formatCommunity(community),
     }))
   );
