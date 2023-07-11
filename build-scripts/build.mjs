@@ -3,6 +3,7 @@ import { execSync } from "child_process";
 
 import { targets, buildTargetDefinition } from "./targets.mjs";
 import { __dirname, getBuildFolder } from "./paths.mjs";
+import { getManifestForTarget } from "./manifests.mjs";
 
 /**
  * @param {string} target
@@ -14,8 +15,11 @@ async function buildTarget(target) {
   fs.cpSync(__dirname + "/ts-output", buildFolder, { recursive: true });
 
   // Copy manifest file for this target.
-  const manifest = `${__dirname}/manifests/manifest_${target}.json`;
-  fs.cpSync(manifest, buildFolder + "/manifest.json");
+  const manifest = await getManifestForTarget(target);
+  fs.writeFileSync(
+    buildFolder + "/manifest.json",
+    JSON.stringify(manifest, null, 2)
+  );
 
   // Replace target variable, for logic that depends on target.
   const buildTargetFilePath = `${buildFolder}/build-target.js`;
