@@ -1,13 +1,18 @@
-const nsfwCheckbox = document.getElementById("nsfw-checkbox");
-const domainInput = document.getElementById("domain-input");
-const saveButton = document.getElementById("save-button");
-const resetButton = document.getElementById("reset-button");
+import { GetFederatedInstancesResponse } from "lemmy-js-client";
+
+import { getStorage, writeStorage } from "./storage.js";
+
+const nsfwCheckbox = document.getElementById(
+  "nsfw-checkbox"
+) as HTMLInputElement;
+const domainInput = document.getElementById("domain-input") as HTMLInputElement;
+const saveButton = document.getElementById("save-button") as HTMLButtonElement;
+const resetButton = document.getElementById(
+  "reset-button"
+) as HTMLButtonElement;
 const statusText = document.getElementById("status-text");
 
-/**
- * @param {string} text
- */
-function setStatus(text) {
+function setStatus(text: string) {
   if (!statusText) {
     throw new Error("Couldn't find status text element");
   }
@@ -22,8 +27,7 @@ if (saveButton) {
 
     if (domain) {
       try {
-        /** @type {import('lemmy-js-client').GetFederatedInstancesResponse} */
-        const instances = await (
+        const instances: GetFederatedInstancesResponse = await (
           await fetch(`https://${domain}/api/v3/federated_instances`)
         ).json();
 
@@ -38,7 +42,7 @@ if (saveButton) {
       }
     }
 
-    chrome.storage.sync.set({
+    writeStorage({
       showNsfw: nsfwCheckbox && nsfwCheckbox.checked,
       instanceDomain: domainInput?.value?.trim() || undefined,
     });
@@ -57,7 +61,7 @@ if (resetButton) {
 }
 
 async function restore() {
-  const storage = await chrome.storage.sync.get(["showNsfw", "instanceDomain"]);
+  const storage = await getStorage();
   if (nsfwCheckbox) {
     nsfwCheckbox.checked = storage.showNsfw;
   }
