@@ -74,10 +74,10 @@ export async function getUrlFromText(text: string) {
   const firstCommunity = (await getFilteredCommunities(text))[0];
 
   if (firstCommunity) {
-    return getCommunityUrl(firstCommunity);
+    return await getCommunityUrl(firstCommunity);
   }
 
-  return `${getPreferredInstanceUrl()}/search?q=${encodeURIComponent(
+  return `${await getPreferredInstanceUrl()}/search?q=${encodeURIComponent(
     text
   )}&type=Communities`;
 }
