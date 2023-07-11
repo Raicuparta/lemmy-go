@@ -7,7 +7,7 @@ export default {
     type: "module",
   },
   omnibox: {
-    keyword: "lc",
+    keyword: "lg",
   },
   permissions: ["storage"],
   action: {
