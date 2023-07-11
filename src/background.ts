@@ -1,9 +1,15 @@
-/**
- * @typedef {{ url: string, subscribers: number, monthlyActiveUsers: number, domain: string, nsfw: boolean, name: string, title: string }} Community
- */
+interface Community {
+  url: string;
+  subscribers: number;
+  monthlyActiveUsers: number;
+  domain: string;
+  nsfw: boolean;
+  name: string;
+  title: string;
+}
 
-/** @type {'$BUILD_TARGET_UNSET$' | 'chrome' | 'firefox'} */
-const buildTarget = "$BUILD_TARGET_UNSET$";
+type BuildTarget = "$BUILD_TARGET_UNSET$" | "chrome" | "firefox";
+const buildTarget: BuildTarget = "$BUILD_TARGET_UNSET$";
 
 const apiUrl = "https://lemmy.raicuparta.com/communities.json";
 const fallbackInstanceDomain = "lemmy.ml";
@@ -12,16 +18,12 @@ if (buildTarget === "$BUILD_TARGET_UNSET$") {
   throw new Error("Build target has not been set. Set it.");
 }
 
-/** @type {Community[]} */
-let communities = [];
+let communities: Community[] = [];
 
-/** @type {{ showNsfw: boolean, instanceDomain: string } | undefined} */
-let storage;
+type AppStorage = { showNsfw: boolean; instanceDomain: string };
+let storage: AppStorage | undefined;
 
-/**
- * @param {string} text
- */
-async function getUrlFromText(text) {
+async function getUrlFromText(text: string) {
   const [name, domain] = text.split("@");
 
   if (domain) {
@@ -62,37 +64,26 @@ function setUpInitialText() {
 async function setUpCommunities() {
   const result = await fetch(`${apiUrl}?nocache=${Math.random()}`);
 
-  /** @type {Community[]} */
-  const communitiesJson = await result.json();
+  const communitiesJson = (await result.json()) as Community[];
 
   communities = communitiesJson.sort(
     (communityA, communityB) => communityB.subscribers - communityA.subscribers
   );
 }
 
-/**
- * @param {Community} community
- */
-const formatCommunity = (community) =>
+const formatCommunity = (community: Community) =>
   `${escapeOmniboxString(community.title)} (${getCommunityId(community)}, ${
     community.subscribers
   } subs)`;
 
-/**
- * @param {string} text
- * @param {string} searchTerm
- */
-function matches(text, searchTerm) {
+function matches(text: string, searchTerm: string) {
   const normalizedText = text.toLocaleLowerCase();
   const normalizedSearchTerm = searchTerm.toLocaleLowerCase();
 
   return normalizedText.includes(normalizedSearchTerm);
 }
 
-/**
- * @param {string} text
- */
-async function getCommunity(text) {
+async function getCommunity(text: string) {
   if (communities.length === 0) {
     await setUpCommunities();
   }
@@ -102,10 +93,7 @@ async function getCommunity(text) {
   );
 }
 
-/**
- * @param {string} text
- */
-async function getFilteredCommunities(text) {
+async function getFilteredCommunities(text: string) {
   if (communities.length === 0) {
     await setUpCommunities();
   }
@@ -130,22 +118,17 @@ async function getFilteredCommunities(text) {
   );
 }
 
-/** @param {Community} community */
-function getCommunityId(community) {
+function getCommunityId(community: Community) {
   return `${community.name}@${community.domain}`;
 }
 
-/** @param {Community} community */
-function getCommunityUrl(community) {
+function getCommunityUrl(community: Community) {
   return storage?.instanceDomain && storage.instanceDomain !== community.domain
     ? `${getPreferredInstanceUrl()}/c/${getCommunityId(community)}`
     : community.url;
 }
 
-/**
- * @param {string} text
- */
-function escapeOmniboxString(text) {
+function escapeOmniboxString(text: string) {
   // In Chrome, the omnibox suggestions are XML. That means we need to escape certain characters there.
   // In Firefox, the omnibox suggestions are plain text. That means we can't escape those same characters.
   if (buildTarget === "firefox") return text;
@@ -171,18 +154,11 @@ function escapeOmniboxString(text) {
 const array = [];
 const characterCodeCache = [];
 
-/**
- * @param {string} text
- */
-function normalizeText(text) {
+function normalizeText(text: string) {
   return text.toLowerCase().replaceAll(" ", "");
 }
 
-/**
- * @param {Community} community
- * @param {string} query
- */
-function score(community, query) {
+function score(community: Community, query: string) {
   const id = getCommunityId(community);
   const name = normalizeText(community.name);
   const title = normalizeText(community.title);
@@ -201,7 +177,10 @@ function score(community, query) {
 chrome.omnibox.onInputStarted.addListener(async () => {
   setUpInitialText();
   setUpCommunities();
-  storage = await chrome.storage.sync.get(["showNsfw", "instanceDomain"]);
+  storage = (await chrome.storage.sync.get([
+    "showNsfw",
+    "instanceDomain",
+  ])) as AppStorage;
 });
 
 chrome.omnibox.onInputChanged.addListener(async (text, suggest) => {

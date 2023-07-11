@@ -1,7 +1,11 @@
-const nsfwCheckbox = document.getElementById("nsfw-checkbox");
-const domainInput = document.getElementById("domain-input");
-const saveButton = document.getElementById("save-button");
-const resetButton = document.getElementById("reset-button");
+const nsfwCheckbox = document.getElementById(
+  "nsfw-checkbox"
+) as HTMLInputElement;
+const domainInput = document.getElementById("domain-input") as HTMLInputElement;
+const saveButton = document.getElementById("save-button") as HTMLButtonElement;
+const resetButton = document.getElementById(
+  "reset-button"
+) as HTMLButtonElement;
 
 if (saveButton) {
   saveButton.onclick = () => {

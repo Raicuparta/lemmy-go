@@ -5,6 +5,7 @@
   "author": "Raicuparta",
   "license": "MIT",
   "scripts": {
+    "build-ts": "tsc",
     "build": "pnpm run build-chrome & pnpm run build-firefox",
     "watch": "pnpm run watch-chrome & pnpm run watch-firefox",
     "build-chrome": "pnpm run _build-zip chrome",

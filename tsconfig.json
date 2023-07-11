@@ -3,9 +3,9 @@
     "target": "ESNext",
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
     "allowJs": true,
-    "checkJs": true,
-    "skipLibCheck": false,
-    "noImplicitAny": false,
+    "checkJs": false,
+    "skipLibCheck": true,
+    "noImplicitAny": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "strict": true,
@@ -14,7 +14,7 @@
     "moduleResolution": "Node",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "noEmit": true
+    "outDir": "./build-ts"
   },
   "include": ["./src", ".build-scripts"],
   "exclude": ["**/*.d.ts", "build", "node_modules"]
