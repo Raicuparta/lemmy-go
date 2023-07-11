@@ -5,6 +5,7 @@ import {
   getFilteredCommunities,
   setUpCommunities,
 } from "./communities.js";
+import { isInstanceFederated } from "./federated-instances.js";
 import { getStorageValue } from "./storage.js";
 
 const fallbackInstanceDomain = "lemmy.ml";
@@ -27,8 +28,11 @@ async function getPreferredInstanceUrl() {
 
 async function getCommunityUrl(community: Community) {
   const instanceDomain = await getStorageValue("instanceDomain");
-  return instanceDomain && instanceDomain !== community.domain
-    ? `${getPreferredInstanceUrl()}/c/${getCommunityId(community)}`
+
+  return (await isInstanceFederated(community.domain)) &&
+    instanceDomain &&
+    instanceDomain !== community.domain
+    ? `${await getPreferredInstanceUrl()}/c/${getCommunityId(community)}`
     : community.url;
 }
 
@@ -37,7 +41,11 @@ export async function getUrlFromText(text: string) {
 
   if (domain) {
     const instanceDomain = await getStorageValue("instanceDomain");
-    if (instanceDomain && instanceDomain !== domain) {
+    if (
+      (await isInstanceFederated(domain)) &&
+      instanceDomain &&
+      instanceDomain !== domain
+    ) {
       return `https://${instanceDomain}/c/${name}@${domain}`;
     } else {
       return `https://${domain}/c/${name}`;
@@ -47,10 +55,10 @@ export async function getUrlFromText(text: string) {
   const firstCommunity = (await getFilteredCommunities(text))[0];
 
   if (firstCommunity) {
-    return getCommunityUrl(firstCommunity);
+    return await getCommunityUrl(firstCommunity);
   }
 
-  return `${getPreferredInstanceUrl()}/search?q=${encodeURIComponent(
+  return `${await getPreferredInstanceUrl()}/search?q=${encodeURIComponent(
     text
   )}&type=Communities`;
 }
