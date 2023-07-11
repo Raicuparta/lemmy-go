@@ -1,14 +1,13 @@
 import fs from "fs";
 import { execSync } from "child_process";
 
+import { targets, buildTargetDefinition } from "./targets.mjs";
 import { __dirname, getBuildFolder } from "./paths.mjs";
 
 /**
  * @param {string} target
  */
-export async function build(target) {
-  execSync("tsc");
-
+async function buildTarget(target) {
   // Copy main source files.
   const buildFolder = getBuildFolder(target);
   fs.cpSync(__dirname + "/src/static", buildFolder, { recursive: true });
@@ -31,7 +30,10 @@ export async function build(target) {
   );
 }
 
-/**
- * @param {string} target
- */
-const buildTargetDefinition = (target) => `const buildTarget = "${target}";`;
+export async function build() {
+  execSync("tsc");
+
+  for (const target of targets) {
+    buildTarget(target);
+  }
+}

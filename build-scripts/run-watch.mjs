@@ -4,7 +4,7 @@ import { __dirname } from "./paths.mjs";
 
 async function safeBuild() {
   try {
-    await build(process.argv[2]);
+    await build();
     console.log("Built successfully, I think.");
   } catch (error) {
     console.error(
