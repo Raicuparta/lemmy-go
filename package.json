@@ -1,7 +1,5 @@
 {
   "name": "lemmy-go",
-  "version": "0.6.0",
-  "main": "background.js",
   "author": "Raicuparta",
   "license": "MIT",
   "scripts": {
