@@ -1,6 +1,6 @@
-import { GetFederatedInstancesResponse } from "lemmy-js-client";
+import { GetFederatedInstancesResponse, Instance } from "lemmy-js-client";
 
-import { getStorage, writeStorage } from "./storage.js";
+import { clearStorage, getStorage, writeStorage } from "./storage.js";
 
 const nsfwCheckbox = document.getElementById(
   "nsfw-checkbox"
@@ -24,15 +24,21 @@ if (saveButton) {
     setStatus("Validating instance...");
 
     const domain = domainInput?.value?.trim() || undefined;
+    let instancesResponse: GetFederatedInstancesResponse | undefined;
 
     if (domain) {
       try {
-        const instances: GetFederatedInstancesResponse = await (
+        instancesResponse = await (
           await fetch(`https://${domain}/api/v3/federated_instances`)
         ).json();
 
+        if (!instancesResponse)
+          throw new Error(
+            "Empty response when trying to get federated instances"
+          );
+
         setStatus(
-          instances.federated_instances?.blocked
+          instancesResponse.federated_instances?.blocked
             .map((instance) => instance.domain)
             .join(", ") ?? "empty"
         );
@@ -42,9 +48,21 @@ if (saveButton) {
       }
     }
 
+    const federatedInstances = instancesResponse?.federated_instances;
+
+    function instancesToDomains(instances: Instance[] | undefined) {
+      if (!instances) return [];
+      return instances.map((instance) => instance.domain);
+    }
+
     writeStorage({
       showNsfw: nsfwCheckbox && nsfwCheckbox.checked,
       instanceDomain: domainInput?.value?.trim() || undefined,
+      federatedInstances: {
+        allowed: instancesToDomains(federatedInstances?.allowed),
+        linked: instancesToDomains(federatedInstances?.linked),
+        blocked: instancesToDomains(federatedInstances?.blocked),
+      },
     });
   };
 } else {
@@ -53,7 +71,7 @@ if (saveButton) {
 
 if (resetButton) {
   resetButton.onclick = async () => {
-    chrome.storage.sync.clear();
+    clearStorage();
     restore();
   };
 } else {

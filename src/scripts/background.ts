@@ -25,10 +25,33 @@ async function getPreferredInstanceUrl() {
   }`;
 }
 
+async function isInstanceFederated(instanceDomain: string) {
+  const federatedInstances = await getStorageValue("federatedInstances");
+
+  if (
+    federatedInstances.blocked.find((instance) => instance === instanceDomain)
+  ) {
+    return false;
+  }
+
+  if (
+    ![...federatedInstances.allowed, ...federatedInstances.linked].find(
+      (instance) => instance === instanceDomain
+    )
+  ) {
+    return false;
+  }
+
+  return true;
+}
+
 async function getCommunityUrl(community: Community) {
   const instanceDomain = await getStorageValue("instanceDomain");
-  return instanceDomain && instanceDomain !== community.domain
-    ? `${getPreferredInstanceUrl()}/c/${getCommunityId(community)}`
+
+  return (await isInstanceFederated(community.domain)) &&
+    instanceDomain &&
+    instanceDomain !== community.domain
+    ? `${await getPreferredInstanceUrl()}/c/${getCommunityId(community)}`
     : community.url;
 }
 
@@ -37,7 +60,11 @@ export async function getUrlFromText(text: string) {
 
   if (domain) {
     const instanceDomain = await getStorageValue("instanceDomain");
-    if (instanceDomain && instanceDomain !== domain) {
+    if (
+      (await isInstanceFederated(domain)) &&
+      instanceDomain &&
+      instanceDomain !== domain
+    ) {
       return `https://${instanceDomain}/c/${name}@${domain}`;
     } else {
       return `https://${domain}/c/${name}`;
