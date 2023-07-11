@@ -1,11 +1,6 @@
 const defaultValues = {
   showNsfw: false,
   instanceDomain: "",
-  federatedInstances: {
-    linked: [] as string[],
-    allowed: [] as string[],
-    blocked: [] as string[],
-  },
 };
 
 type AppStorage = typeof defaultValues;

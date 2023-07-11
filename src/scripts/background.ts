@@ -5,6 +5,7 @@ import {
   getFilteredCommunities,
   setUpCommunities,
 } from "./communities.js";
+import { getFederatedInstances } from "./federated-instances.js";
 import { getStorageValue } from "./storage.js";
 
 const fallbackInstanceDomain = "lemmy.ml";
@@ -26,7 +27,7 @@ async function getPreferredInstanceUrl() {
 }
 
 async function isInstanceFederated(instanceDomain: string) {
-  const federatedInstances = await getStorageValue("federatedInstances");
+  const federatedInstances = await getFederatedInstances(instanceDomain);
 
   if (
     federatedInstances.blocked.find((instance) => instance === instanceDomain)

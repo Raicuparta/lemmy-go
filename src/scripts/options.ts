@@ -1,6 +1,7 @@
 import { GetFederatedInstancesResponse, Instance } from "lemmy-js-client";
 
 import { clearStorage, getStorage, writeStorage } from "./storage.js";
+import { getFederatedInstances } from "./federated-instances.js";
 
 const nsfwCheckbox = document.getElementById(
   "nsfw-checkbox"
@@ -24,31 +25,14 @@ if (saveButton) {
     setStatus("Validating instance...");
 
     const domain = domainInput?.value?.trim() || undefined;
-    let instancesResponse: GetFederatedInstancesResponse | undefined;
-
     if (domain) {
       try {
-        instancesResponse = await (
-          await fetch(`https://${domain}/api/v3/federated_instances`)
-        ).json();
-
-        if (!instancesResponse)
-          throw new Error(
-            "Empty response when trying to get federated instances"
-          );
-
-        setStatus(
-          instancesResponse.federated_instances?.blocked
-            .map((instance) => instance.domain)
-            .join(", ") ?? "empty"
-        );
+        const federatedInstances = await getFederatedInstances(domain, true);
+        setStatus(federatedInstances.blocked.join(", ") ?? "empty");
       } catch (error) {
         setStatus(`Error validating this instance domain: ${error}`);
-        return;
       }
     }
-
-    const federatedInstances = instancesResponse?.federated_instances;
 
     function instancesToDomains(instances: Instance[] | undefined) {
       if (!instances) return [];
@@ -58,11 +42,6 @@ if (saveButton) {
     writeStorage({
       showNsfw: nsfwCheckbox && nsfwCheckbox.checked,
       instanceDomain: domainInput?.value?.trim() || undefined,
-      federatedInstances: {
-        allowed: instancesToDomains(federatedInstances?.allowed),
-        linked: instancesToDomains(federatedInstances?.linked),
-        blocked: instancesToDomains(federatedInstances?.blocked),
-      },
     });
   };
 } else {
