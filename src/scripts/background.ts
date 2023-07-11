@@ -1,4 +1,4 @@
-import { getStorage } from "./storage.js";
+import { getStorageValue } from "./storage.js";
 
 interface Community {
   url: string;
@@ -24,11 +24,11 @@ let communities: Community[] = [];
 
 async function getUrlFromText(text: string) {
   const [name, domain] = text.split("@");
-  const storage = await getStorage();
 
   if (domain) {
-    if (storage.instanceDomain && storage.instanceDomain !== domain) {
-      return `https://${storage.instanceDomain}/c/${name}@${domain}`;
+    const instanceDomain = await getStorageValue("instanceDomain");
+    if (instanceDomain !== domain) {
+      return `https://${instanceDomain}/c/${name}@${domain}`;
     } else {
       return `https://${domain}/c/${name}`;
     }
@@ -46,9 +46,8 @@ async function getUrlFromText(text: string) {
 }
 
 async function getPreferredInstanceUrl() {
-  const storage = await getStorage();
   const instanceDomain = (
-    storage.instanceDomain || fallbackInstanceDomain
+    (await getStorageValue("instanceDomain")) || fallbackInstanceDomain
   ).trim();
 
   return `https://${
@@ -99,7 +98,7 @@ async function getFilteredCommunities(text: string) {
     await setUpCommunities();
   }
 
-  const showNsfw = (await chrome.storage.sync.get("showNsfw")).showNsfw;
+  const showNsfw = await getStorageValue("showNsfw");
 
   return (
     communities
@@ -124,9 +123,7 @@ function getCommunityId(community: Community) {
 }
 
 async function getCommunityUrl(community: Community) {
-  const storage = await getStorage();
-
-  return storage?.instanceDomain && storage.instanceDomain !== community.domain
+  return (await getStorageValue("instanceDomain")) !== community.domain
     ? `${getPreferredInstanceUrl()}/c/${getCommunityId(community)}`
     : community.url;
 }
