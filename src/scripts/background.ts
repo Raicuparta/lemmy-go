@@ -5,7 +5,7 @@ import {
   getFilteredCommunities,
   setUpCommunities,
 } from "./communities.js";
-import { getFederatedInstances } from "./federated-instances.js";
+import { isInstanceFederated } from "./federated-instances.js";
 import { getStorageValue } from "./storage.js";
 
 const fallbackInstanceDomain = "lemmy.ml";
@@ -24,26 +24,6 @@ async function getPreferredInstanceUrl() {
   return `https://${
     instanceDomain.endsWith("/") ? instanceDomain.slice(0, -1) : instanceDomain
   }`;
-}
-
-async function isInstanceFederated(instanceDomain: string) {
-  const federatedInstances = await getFederatedInstances(instanceDomain);
-
-  if (
-    federatedInstances.blocked.find((instance) => instance === instanceDomain)
-  ) {
-    return false;
-  }
-
-  if (
-    ![...federatedInstances.allowed, ...federatedInstances.linked].find(
-      (instance) => instance === instanceDomain
-    )
-  ) {
-    return false;
-  }
-
-  return true;
 }
 
 async function getCommunityUrl(community: Community) {

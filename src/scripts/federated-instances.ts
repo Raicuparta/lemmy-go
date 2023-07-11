@@ -69,3 +69,23 @@ export async function getFederatedInstances(
 
   return cachedFederatedInstances;
 }
+
+export async function isInstanceFederated(instanceDomain: string) {
+  const federatedInstances = await getFederatedInstances(instanceDomain);
+
+  if (
+    federatedInstances.blocked.find((instance) => instance === instanceDomain)
+  ) {
+    return false;
+  }
+
+  if (
+    ![...federatedInstances.allowed, ...federatedInstances.linked].find(
+      (instance) => instance === instanceDomain
+    )
+  ) {
+    return false;
+  }
+
+  return true;
+}

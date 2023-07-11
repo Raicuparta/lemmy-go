@@ -28,15 +28,13 @@ if (saveButton) {
     if (domain) {
       try {
         const federatedInstances = await getFederatedInstances(domain, true);
-        setStatus(federatedInstances.blocked.join(", ") ?? "empty");
+        setStatus(`Success!
+Blocked instances: ${federatedInstances.blocked.length}
+Linked instances: ${federatedInstances.linked.length}
+Allowed instances: ${federatedInstances.allowed.length}`);
       } catch (error) {
         setStatus(`Error validating this instance domain: ${error}`);
       }
-    }
-
-    function instancesToDomains(instances: Instance[] | undefined) {
-      if (!instances) return [];
-      return instances.map((instance) => instance.domain);
     }
 
     writeStorage({
