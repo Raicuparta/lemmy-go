@@ -1,11 +1,17 @@
-const nsfwCheckbox = document.getElementById("nsfw-checkbox");
-const domainInput = document.getElementById("domain-input");
-const saveButton = document.getElementById("save-button");
-const resetButton = document.getElementById("reset-button");
+import { getStorage, writeStorage } from "./storage.js";
+
+const nsfwCheckbox = document.getElementById(
+  "nsfw-checkbox"
+) as HTMLInputElement;
+const domainInput = document.getElementById("domain-input") as HTMLInputElement;
+const saveButton = document.getElementById("save-button") as HTMLButtonElement;
+const resetButton = document.getElementById(
+  "reset-button"
+) as HTMLButtonElement;
 
 if (saveButton) {
   saveButton.onclick = () => {
-    chrome.storage.sync.set({
+    writeStorage({
       showNsfw: nsfwCheckbox && nsfwCheckbox.checked,
       instanceDomain: domainInput?.value?.trim() || undefined,
     });
@@ -24,7 +30,7 @@ if (resetButton) {
 }
 
 async function restore() {
-  const storage = await chrome.storage.sync.get(["showNsfw", "instanceDomain"]);
+  const storage = await getStorage();
   if (nsfwCheckbox) {
     nsfwCheckbox.checked = storage.showNsfw;
   }
