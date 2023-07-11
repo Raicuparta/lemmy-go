@@ -1,4 +1,4 @@
-import baseManifest from "../manifests/manifest_base.mjs";
+import { readFileSync } from "fs";
 
 export function isObject(item) {
   return item && typeof item === "object" && !Array.isArray(item);
@@ -27,10 +27,16 @@ function mergeDeep(target, ...sources) {
   return mergeDeep(target, ...sources);
 }
 
+/** @param {string} name */
+async function readManifest(name) {
+  const manifestFile = readFileSync(`./manifests/manifest_${name}.json`);
+  return JSON.parse(manifestFile.toString());
+}
+
 /** @param {string} target */
 export async function getManifestForTarget(target) {
-  const targetManifest = (await import(`../manifests/manifest_${target}.mjs`))
-    .default;
+  const baseManifest = await readManifest("base");
+  const targetManifest = await readManifest(target);
 
   return mergeDeep({}, baseManifest, targetManifest);
 }
