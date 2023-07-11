@@ -1,3 +1,5 @@
+import { getStorage } from "./storage.js";
+
 interface Community {
   url: string;
   subscribers: number;
@@ -20,14 +22,12 @@ if (buildTarget === "$BUILD_TARGET_UNSET$") {
 
 let communities: Community[] = [];
 
-type AppStorage = { showNsfw: boolean; instanceDomain: string };
-let storage: AppStorage | undefined;
-
 async function getUrlFromText(text: string) {
   const [name, domain] = text.split("@");
+  const storage = await getStorage();
 
   if (domain) {
-    if (storage?.instanceDomain && storage.instanceDomain !== domain) {
+    if (storage.instanceDomain && storage.instanceDomain !== domain) {
       return `https://${storage.instanceDomain}/c/${name}@${domain}`;
     } else {
       return `https://${domain}/c/${name}`;
@@ -45,9 +45,10 @@ async function getUrlFromText(text: string) {
   )}&type=Communities`;
 }
 
-function getPreferredInstanceUrl() {
+async function getPreferredInstanceUrl() {
+  const storage = await getStorage();
   const instanceDomain = (
-    storage?.instanceDomain || fallbackInstanceDomain
+    storage.instanceDomain || fallbackInstanceDomain
   ).trim();
 
   return `https://${
@@ -122,7 +123,9 @@ function getCommunityId(community: Community) {
   return `${community.name}@${community.domain}`;
 }
 
-function getCommunityUrl(community: Community) {
+async function getCommunityUrl(community: Community) {
+  const storage = await getStorage();
+
   return storage?.instanceDomain && storage.instanceDomain !== community.domain
     ? `${getPreferredInstanceUrl()}/c/${getCommunityId(community)}`
     : community.url;
@@ -151,11 +154,8 @@ function escapeOmniboxString(text: string) {
   });
 }
 
-const array = [];
-const characterCodeCache = [];
-
 function normalizeText(text: string) {
-  return text.toLowerCase().replaceAll(" ", "");
+  return text.toLowerCase().replace(/ /g, "");
 }
 
 function score(community: Community, query: string) {
@@ -177,10 +177,6 @@ function score(community: Community, query: string) {
 chrome.omnibox.onInputStarted.addListener(async () => {
   setUpInitialText();
   setUpCommunities();
-  storage = (await chrome.storage.sync.get([
-    "showNsfw",
-    "instanceDomain",
-  ])) as AppStorage;
 });
 
 chrome.omnibox.onInputChanged.addListener(async (text, suggest) => {

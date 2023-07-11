@@ -6,7 +6,8 @@
   "background": {
     "scripts": [
       "background.js"
-    ]
+    ],
+    "type": "module"
   },
   "omnibox": {
     "keyword": "lc"
