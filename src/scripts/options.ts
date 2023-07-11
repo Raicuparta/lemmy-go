@@ -1,4 +1,4 @@
-import { getStorage, writeStorage } from "./storage";
+import { getStorage, writeStorage } from "./storage.js";
 
 const nsfwCheckbox = document.getElementById(
   "nsfw-checkbox"

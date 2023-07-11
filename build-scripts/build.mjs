@@ -19,11 +19,11 @@ export async function build(target) {
   fs.cpSync(manifest, buildFolder + "/manifest.json");
 
   // Replace target variable, for logic that depends on target.
-  const backgroundJsFilePath = `${buildFolder}/background.js`;
-  const backgroundJsFileText = fs.readFileSync(backgroundJsFilePath).toString();
+  const buildTargetFilePath = `${buildFolder}/build-target.js`;
+  const backgroundJsFileText = fs.readFileSync(buildTargetFilePath).toString();
 
   fs.writeFileSync(
-    backgroundJsFilePath,
+    buildTargetFilePath,
     backgroundJsFileText.replace(
       buildTargetDefinition("$BUILD_TARGET_UNSET$"),
       buildTargetDefinition(target)
