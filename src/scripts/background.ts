@@ -70,9 +70,10 @@ export async function getUrlFromText(text: string) {
         const tab = await navigateTo(communityUrl, "newBackgroundTab");
         await new Promise((resolve, reject) => {
           chrome.tabs.onUpdated.addListener(function onTabUpdated(
-            tabId: number
+            tabId: number,
+            changeInfo
           ) {
-            if (tab.id !== tabId) return;
+            if (tab.id !== tabId || changeInfo.status !== "complete") return;
 
             chrome.tabs.onUpdated.removeListener(onTabUpdated);
             chrome.tabs.remove(tab.id);
