@@ -1,6 +1,6 @@
 # Lemmy Go
 
-[Lemmy Go](https://lemmy.raicuparta.com) is a extension that adds a new search keyword (`lg`) for more easily navigating to Lemmy communities.
+[Lemmy Go](https://lemmy.raicuparta.com) is a extension that adds a new search keyword ("lg") for more easily navigating to Lemmy communities.
 
 ## Install
 
@@ -10,11 +10,11 @@
 
 ## Usage
 
-Type `lg` followed by a space (some browsers also accept tab instead), and then type the name of the community you're looking for.
+Type "lg" followed by a space (some browsers also accept tab instead), and then type the name of the community you're looking for.
 
-Example: `lg firefox`
+Example: "lg firefox"
 
-Lemmy Go will search its database for any community that has the text `firefox` in its name (e.g. `linux_gaming`) or title (`Linux Gaming`).
+Lemmy Go will search its database for any community that has the text "firefox" in its name (e.g. "linux_gaming") or title ("Linux Gaming").
 
 If you just type a community name and press enter, Lemmy Go will take you to the most popular community from that list.
 
@@ -28,19 +28,19 @@ Clicking the extension's icon will show a popup with some settings that can be a
 
 If you set your preferred instance in the user settings, Lemmy Go will try its best to navigate to that community in your preferred instance, although this isn't always possible (in which case Lemmy Go will just navigate to the remote instance instead).
 
-For instance, if your preferred instance is set to `lemmy.ml` and you select `firefox@lemmy.world`, Lemmy Go will take you to `lemmy.ml/c/firefox@lemmy.world`.
+For instance, if your preferred instance is set to "lemmy.ml" and you select "firefox@lemmy.world", Lemmy Go will take you to "lemmy.ml/c/firefox@lemmy.world".
 
-But if `lemmy.ml` blocks the `lemmy.world` instance, then Lemmy Go will take you to `lemmy.world/c/firefox` instead.
+But if "lemmy.ml" blocks the "lemmy.world" instance, then Lemmy Go will take you to "lemmy.world/c/firefox" instead.
 
 ### Filtering by instance
 
-If you include a `@` in your query, you're able to filter by instance too. For instance `lg firefox@lemmy.world`.
+If you include a "@" in your query, you're able to filter by instance too. For instance "lg firefox@lemmy.world".
 
 ## Why is this needed?
 
-On Reddit, I had a simple search keyword for navigating directly to subreddits, where I could just type `r firefox` and be taken to `reddit.com/r/firefox`.
+On Reddit, I had a simple search keyword for navigating directly to subreddits, where I could just type "r firefox" and be taken to "reddit.com/r/firefox".
 
-I would like to have the same behaviour for Lemmy, but the Fediverse makes this a lot more complicated. Even if you're constantly writing the full community name@instance pair, there's still the problem of errors when navigating to blocked instances, or instance links that are broken for whatever reason.
+I wanted to have the same behaviour for Lemmy, but the Fediverse makes this a lot more complicated. Even if you're constantly writing the full community name@instance pair, there's still the problem of errors when navigating to blocked instances, or instance links that are broken for whatever reason.
 
 So I made this extension to try and make it as simply as possible to jump to a community, or even find new ones more easily.
 
