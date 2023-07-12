@@ -85,8 +85,6 @@ Try again, but accept the permissions request.
 }
 Error: ${error}`
       );
-
-      return;
     }
   }
 
