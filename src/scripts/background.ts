@@ -95,29 +95,41 @@ export async function getUrlFromText(text: string) {
   )}&type=Communities`;
 }
 
+function formatContent(suggestionContent: string) {
+  // This one is really stupid. If a suggestion's content is the same as the current query text,
+  // that suggestion will disappear. The sensible way to solve this would probably be using a
+  // default suggestion instead of a regular suggestion. Unfortunately, Firefox has a bug that
+  // makes that solution unusable: https://bugzilla.mozilla.org/show_bug.cgi?id=1166831. So my
+  // workaround is to just add a space to the content space to make it different.
+  // The space is removed when actually using the content text afterwards.
+  return `${suggestionContent} `;
+}
+
 chrome.omnibox.onInputStarted.addListener(async () => {
   setUpInitialText();
   setUpCommunities();
 });
 
 chrome.omnibox.onInputChanged.addListener(async (text, suggest) => {
-  if (!text) {
-    setUpInitialText();
-    return;
-  }
+  setUpInitialText();
 
   const filteredCommunities = await getFilteredCommunities(text);
 
   if (filteredCommunities.length === 0) {
-    chrome.omnibox.setDefaultSuggestion({
-      description: `Failed to find any Lemmy communities.`,
-    });
+    suggest([
+      {
+        content: formatContent(text),
+        description: `Found nothing. Search on ${
+          (await getStorageValue("instanceDomain")) || fallbackInstanceDomain
+        } instead?`,
+      },
+    ]);
     return;
   }
 
   suggest(
     filteredCommunities.map((community) => ({
-      content: getCommunityId(community),
+      content: formatContent(getCommunityId(community)),
       description: formatCommunity(community),
     }))
   );
@@ -139,7 +151,7 @@ async function navigateTo(
 
 chrome.omnibox.onInputEntered.addListener(async (text, disposition) => {
   console.log(`Entered text: ${text}`);
-  const url = await getUrlFromText(text);
+  const url = await getUrlFromText(text.trim());
   console.log(`Text resulted in URL: ${url}`);
 
   const tab = await navigateTo(url, disposition);
