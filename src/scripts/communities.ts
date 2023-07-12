@@ -25,27 +25,18 @@ export async function setUpCommunities() {
   );
 }
 
+export async function getCommunities() {
+  if (communities.length === 0) {
+    await setUpCommunities();
+  }
+
+  return communities;
+}
+
 export const formatCommunity = (community: Community) =>
   `${escapeOmniboxString(community.title)} (${getCommunityId(community)}, ${
     community.subscribers
   } subs)`;
-
-function matches(text: string, searchTerm: string) {
-  const normalizedText = text.toLocaleLowerCase();
-  const normalizedSearchTerm = searchTerm.toLocaleLowerCase();
-
-  return normalizedText.includes(normalizedSearchTerm);
-}
-
-async function getCommunity(text: string) {
-  if (communities.length === 0) {
-    await setUpCommunities();
-  }
-  return communities.find(
-    (community) =>
-      matches(community.name, text) || matches(community.title, text)
-  );
-}
 
 export async function getFilteredCommunities(text: string) {
   if (communities.length === 0) {
