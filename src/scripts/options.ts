@@ -1,23 +1,14 @@
-import { GetFederatedInstancesResponse, Instance } from "lemmy-js-client";
-
-import { clearStorage, getStorage, writeStorage } from "./storage.js";
+import { clearStorage, getStorageValue, writeStorage } from "./storage.js";
 import { getFederatedInstances } from "./federated-instances.js";
-import { getCommunities, getFilteredCommunities } from "./communities.js";
+import { getCommunities } from "./communities.js";
+import { getElement } from "./get-element.js";
 
-const nsfwCheckbox = document.getElementById(
-  "nsfw-checkbox"
-) as HTMLInputElement;
-const domainInput = document.getElementById(
-  "domain-text-input"
-) as HTMLInputElement;
-const domainSelect = document.getElementById(
-  "domain-select"
-) as HTMLSelectElement;
-const saveButton = document.getElementById("save-button") as HTMLButtonElement;
-const resetButton = document.getElementById(
-  "reset-button"
-) as HTMLButtonElement;
-const statusText = document.getElementById("status-text");
+const nsfwCheckbox = getElement<HTMLInputElement>("nsfw-checkbox");
+const domainInput = getElement<HTMLInputElement>("domain-text-input");
+const domainSelect = getElement<HTMLSelectElement>("domain-select");
+const saveButton = getElement<HTMLButtonElement>("save-button");
+const resetButton = getElement<HTMLButtonElement>("reset-button");
+const statusText = getElement<HTMLInputElement>("status-text");
 
 function setStatus(text: string) {
   if (!statusText) {
@@ -26,77 +17,73 @@ function setStatus(text: string) {
   statusText.innerText = text;
 }
 
-if (saveButton) {
-  saveButton.onclick = async () => {
-    const domain = domainInput?.value?.trim() || undefined;
-    if (domain) {
-      setStatus("Validating instance...");
-      try {
-        const federatedInstances = await getFederatedInstances(domain, true);
-        setStatus(`Success!
+async function setUpNsfwSetting() {
+  const showNsfw = await getStorageValue("showNsfw");
+  nsfwCheckbox.checked = showNsfw;
+}
+
+async function setUpDomainSetting() {
+  const preferredDomain = await getStorageValue("instanceDomain");
+  console.log("preferred domain is", preferredDomain);
+
+  domainInput.value = preferredDomain;
+
+  domainSelect.onchange = () => {
+    domainInput.value = domainSelect.value;
+  };
+
+  const instanceSet = new Set<string>();
+  for (const community of await getCommunities()) {
+    instanceSet.add(community.domain);
+  }
+
+  const instanceArray = [...instanceSet];
+
+  for (const instance of instanceArray.sort()) {
+    const option = document.createElement("option");
+    option.innerText = instance;
+    option.value = instance;
+    domainSelect.appendChild(option);
+  }
+
+  domainSelect.selectedIndex = instanceArray.indexOf(preferredDomain) + 1;
+}
+
+function onResetClick() {
+  clearStorage();
+  onReady();
+}
+
+async function onSaveClick() {
+  const domain = domainInput.value.trim() || "";
+  if (domain) {
+    setStatus("Validating instance...");
+    try {
+      const federatedInstances = await getFederatedInstances(domain, true);
+      setStatus(`Success!
 Blocked instances: ${federatedInstances.blocked.length}
 Linked instances: ${federatedInstances.linked.length}
 Allowed instances: ${federatedInstances.allowed.length}`);
-      } catch (error) {
-        setStatus(`Error validating this instance domain: ${error}`);
-      }
+    } catch (error) {
+      setStatus(`Error validating this instance domain: ${error}`);
     }
-
-    writeStorage({
-      showNsfw: nsfwCheckbox && nsfwCheckbox.checked,
-      instanceDomain: domainInput?.value?.trim() || "",
-    });
-
-    if (!domain) {
-      setStatus("Settings saved.");
-    }
-  };
-} else {
-  console.error("Failed to find save button");
-}
-
-if (resetButton) {
-  resetButton.onclick = async () => {
-    clearStorage();
-    restore();
-  };
-} else {
-  console.error("Failed to find reset button");
-}
-
-async function restore() {
-  const storage = await getStorage();
-  if (nsfwCheckbox) {
-    nsfwCheckbox.checked = storage.showNsfw;
   }
 
-  const preferredDomain = storage.instanceDomain ?? "";
+  writeStorage({
+    showNsfw: nsfwCheckbox && nsfwCheckbox.checked,
+    instanceDomain: domainInput?.value?.trim() || "",
+  });
 
-  if (domainInput) {
-    domainInput.value = preferredDomain;
-  }
-
-  if (domainSelect) {
-    domainSelect.onchange = () => {
-      domainInput.value = domainSelect.value;
-    };
-
-    const instanceSet = new Set<string>();
-    for (const community of await getCommunities()) {
-      instanceSet.add(community.domain);
-    }
-
-    const instanceArray = [...instanceSet];
-
-    for (const instance of instanceArray.sort()) {
-      const option = document.createElement("option");
-      option.innerText = instance;
-      option.value = instance;
-      domainSelect.appendChild(option);
-    }
-
-    domainSelect.selectedIndex = instanceArray.indexOf(preferredDomain) + 1;
+  if (!domain) {
+    setStatus("Settings saved.");
   }
 }
 
-document.addEventListener("DOMContentLoaded", restore);
+async function onReady() {
+  setUpNsfwSetting();
+  setUpDomainSetting();
+  resetButton.onclick = onResetClick;
+  saveButton.onclick = onSaveClick;
+}
+
+document.addEventListener("DOMContentLoaded", onReady);

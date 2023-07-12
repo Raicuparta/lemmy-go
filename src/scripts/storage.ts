@@ -16,7 +16,7 @@ export async function getStorageValue<K extends StorageKey>(
   key: K
 ): Promise<AppStorage[K]> {
   const storage = await getStorage();
-  return storage[key];
+  return storage[key] ?? defaultValues[key];
 }
 
 export async function writeStorage(values: Partial<AppStorage>) {
