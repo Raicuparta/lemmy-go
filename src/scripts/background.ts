@@ -36,9 +36,15 @@ async function getCommunityUrl(community: Community) {
 
 async function isCommunityAvailableInPreferredInstance(communityId: string) {
   const preferredInstanceDomain = await getStorageValue("instanceDomain");
-  const result = await fetch(
-    `https://${preferredInstanceDomain}/api/v3/community?name=${communityId}`
+  if (!preferredInstanceDomain) false;
+
+  const checkApiUrl = `https://${preferredInstanceDomain}/api/v3/community?name=${communityId}&cacheAvoidance=${Math.random()}`;
+
+  console.log(
+    `Checking if community is availably in preferred instance by fetching ${checkApiUrl}`
   );
+
+  const result = await fetch(checkApiUrl);
   return result.ok;
 }
 
@@ -46,11 +52,12 @@ export async function getUrlFromText(text: string) {
   const [name, domain] = text.split("@");
 
   if (domain) {
+    const communityUrlInRemoteInstance = `https://${domain}/c/${name}`;
     const preferredInstance = await getStorageValue("instanceDomain");
 
     if (await isInstanceFederated(domain)) {
       const communityId = `${name}@${domain}`;
-      const communityUrl = `https://${preferredInstance}/c/${communityId}`;
+      const communityUrlInPreferredInstance = `https://${preferredInstance}/c/${communityId}`;
 
       if (!(await isCommunityAvailableInPreferredInstance(communityId))) {
         // If the preferred instance federates with this community's instance,
@@ -61,9 +68,12 @@ export async function getUrlFromText(text: string) {
         // to the hopefully now active community.
         // Sorry, I hate it too.
         console.log(
-          `Activating community by opening ${communityUrl} in the background`
+          `Trying to activate community by opening ${communityUrlInPreferredInstance} in the background`
         );
-        const tab = await navigateTo(communityUrl, "newBackgroundTab");
+        const tab = await navigateTo(
+          communityUrlInPreferredInstance,
+          "newBackgroundTab"
+        );
         await new Promise((resolve, reject) => {
           chrome.tabs.onUpdated.addListener(function onTabUpdated(
             tabId: number,
@@ -76,11 +86,23 @@ export async function getUrlFromText(text: string) {
             resolve(null);
           });
         });
+
+        if (!(await isCommunityAvailableInPreferredInstance(communityId))) {
+          // If it still doesn't work, we give up and just navigate to that instance directly.
+          console.log(
+            `Activating community ${communityId} didn't work, navigate directly instead`
+          );
+          return communityUrlInRemoteInstance;
+        } else {
+          console.log(
+            `Successfully activated ${communityId} in the preferred instance.`
+          );
+        }
       }
 
-      return communityUrl;
+      return communityUrlInPreferredInstance;
     } else {
-      return `https://${domain}/c/${name}`;
+      return communityUrlInRemoteInstance;
     }
   }
 
@@ -155,6 +177,7 @@ chrome.omnibox.onInputEntered.addListener(async (text, disposition) => {
   console.log(`Text resulted in URL: ${url}`);
 
   const tab = await navigateTo(url, disposition);
+
   chrome.tabs.onUpdated.addListener(function onTabUpdated(tabId: number) {
     if (tab.id !== tabId) return;
 
