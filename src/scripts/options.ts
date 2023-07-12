@@ -28,10 +28,9 @@ function setStatus(text: string) {
 
 if (saveButton) {
   saveButton.onclick = async () => {
-    setStatus("Validating instance...");
-
     const domain = domainInput?.value?.trim() || undefined;
     if (domain) {
+      setStatus("Validating instance...");
       try {
         const federatedInstances = await getFederatedInstances(domain, true);
         setStatus(`Success!
@@ -45,8 +44,12 @@ Allowed instances: ${federatedInstances.allowed.length}`);
 
     writeStorage({
       showNsfw: nsfwCheckbox && nsfwCheckbox.checked,
-      instanceDomain: domainInput?.value?.trim() || undefined,
+      instanceDomain: domainInput?.value?.trim() || "",
     });
+
+    if (!domain) {
+      setStatus("Settings saved.");
+    }
   };
 } else {
   console.error("Failed to find save button");
