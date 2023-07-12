@@ -59,7 +59,7 @@ export async function getUrlFromText(text: string) {
       if (!(await isCommunityAvailableInPreferredInstance(communityId))) {
         // If the preferred instance federates with this community's instance,
         // but the community isn't active in the preferred instance,
-        // navigating to that community on our preferred instance will throw an error,
+        // navigating to that community on our preferred instance will throw an error (likely a Lemmy bug),
         // but this will also trigger the activation of this community on our preferred instance.
         // So we navigate there once in a background tab, and then later navigate again,
         // to the hopefully now active community.
