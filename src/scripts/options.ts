@@ -7,7 +7,9 @@ import { getCommunities, getFilteredCommunities } from "./communities.js";
 const nsfwCheckbox = document.getElementById(
   "nsfw-checkbox"
 ) as HTMLInputElement;
-const domainInput = document.getElementById("domain-input") as HTMLInputElement;
+const domainInput = document.getElementById(
+  "domain-text-input"
+) as HTMLInputElement;
 const domainSelect = document.getElementById(
   "domain-select"
 ) as HTMLSelectElement;
