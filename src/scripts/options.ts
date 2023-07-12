@@ -1,5 +1,5 @@
 import { clearStorage, getStorageValue, writeStorage } from "./storage.js";
-import { getFederatedInstances } from "./federated-instances.js";
+import { getBlockedInstances } from "./federated-instances.js";
 import { getCommunities } from "./communities.js";
 import { getElement } from "./get-element.js";
 
@@ -54,11 +54,9 @@ function onResetClick() {
 }
 
 async function initializeFederatedInstances(domain: string) {
-  const federatedInstances = await getFederatedInstances(domain, true);
+  const federatedInstances = await getBlockedInstances(domain, true);
   setStatus(`Success!
-Blocked instances: ${federatedInstances.blocked.length}
-Linked instances: ${federatedInstances.linked.length}
-Allowed instances: ${federatedInstances.allowed.length}`);
+Blocked instances: ${federatedInstances.length}`);
 }
 
 async function onSaveClick() {

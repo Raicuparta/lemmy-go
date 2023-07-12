@@ -1,37 +1,20 @@
-import { GetFederatedInstancesResponse, Instance } from "lemmy-js-client";
+import { GetFederatedInstancesResponse } from "lemmy-js-client";
 
 import { getStorageValue } from "./storage.js";
 
-const defaultFederatedInstances = {
-  linked: [] as string[],
-  allowed: [] as string[],
-  blocked: [] as string[],
-};
+const cacheKey = "blockedInstances" as const;
 
-type FederatedInstancesCache = typeof defaultFederatedInstances;
-
-const cacheKey = "federatedInstances" as const;
-
-async function getCachedFederatedInstances() {
-  return (await chrome.storage.local.get([cacheKey]))[
-    cacheKey
-  ] as FederatedInstancesCache;
+async function getCachedBlockedInstances() {
+  return (await chrome.storage.local.get([cacheKey]))[cacheKey] as string[];
 }
 
-async function setCachedFederatedInstances(
-  federatedInstances: FederatedInstancesCache
-) {
+async function setCachedBlockedInstances(blockedInstances: string[]) {
   await chrome.storage.local.set({
-    [cacheKey]: federatedInstances,
+    [cacheKey]: blockedInstances,
   });
 }
 
-function instancesToDomains(instances: Instance[] | undefined) {
-  if (!instances) return [];
-  return instances.map((instance) => instance.domain);
-}
-
-async function updateFederatedInstancesCache(domain: string) {
+async function updateBlockedInstancesCache(domain: string) {
   console.log("Updating federated instances cache...");
   let instancesResponse: GetFederatedInstancesResponse | undefined;
 
@@ -45,33 +28,26 @@ async function updateFederatedInstancesCache(domain: string) {
     throw new Error("Empty response when trying to get federated instances");
   }
 
-  const cache = {
-    allowed: instancesToDomains(federatedInstances.allowed),
-    linked: instancesToDomains(federatedInstances.linked),
-    blocked: instancesToDomains(federatedInstances.blocked),
-  };
+  const cache = federatedInstances.blocked.map((instance) => instance.domain);
 
-  setCachedFederatedInstances(cache);
+  setCachedBlockedInstances(cache);
 
   console.log("Successfully updated federated instances cache");
   return cache;
 }
 
-export async function getFederatedInstances(
-  domain: string,
-  ignoreCache = false
-) {
-  const cachedFederatedInstances = await getCachedFederatedInstances();
+export async function getBlockedInstances(domain: string, ignoreCache = false) {
+  const cachedFederatedInstances = await getCachedBlockedInstances();
 
   if (!cachedFederatedInstances || ignoreCache) {
     console.log("Federated instances cache is empty, waiting for result.");
-    return await updateFederatedInstancesCache(domain);
+    return await updateBlockedInstancesCache(domain);
   } else {
     console.log(
       "Federated instances cache is present, updating in the background."
     );
     // If there's already a cache, we return the current cache but keep updating in the background.
-    updateFederatedInstancesCache(domain);
+    updateBlockedInstancesCache(domain);
   }
 
   return cachedFederatedInstances;
@@ -83,19 +59,9 @@ export async function isInstanceFederated(remoteInstance: string) {
     return false;
   }
 
-  const federatedInstances = await getFederatedInstances(preferredInstance);
+  const blockedInstances = await getBlockedInstances(preferredInstance);
 
-  if (
-    federatedInstances.blocked.find((instance) => instance === remoteInstance)
-  ) {
-    return false;
-  }
-
-  if (
-    ![...federatedInstances.allowed, ...federatedInstances.linked].find(
-      (instance) => instance === remoteInstance
-    )
-  ) {
+  if (blockedInstances.find((instance) => instance === remoteInstance)) {
     return false;
   }
 
