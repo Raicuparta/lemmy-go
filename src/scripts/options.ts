@@ -77,14 +77,14 @@ async function onSaveClick() {
     } catch (error) {
       setStatus(
         `Error validating this instance domain.
-
 ${
   permissionGranted
     ? ""
-    : `You rejected the request for more permissions, so maybe that's why.
-Try again, but accept the permissions request.`
+    : `
+You rejected the request for more permissions, so maybe that's why.
+Try again, but accept the permissions request.
+`
 }
-
 Error: ${error}`
       );
 
