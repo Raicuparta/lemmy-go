@@ -24,7 +24,6 @@ async function setUpNsfwSetting() {
 
 async function setUpDomainSetting() {
   const preferredDomain = await getStorageValue("instanceDomain");
-  console.log("preferred domain is", preferredDomain);
 
   domainInput.value = preferredDomain;
 
