@@ -97,9 +97,12 @@
       width: calc(100% - 40px);
       height: 100%;
     }
-    .input-description {
-      opacity: 60%;
+    .input-warning {
       font-size: 0.65rem;
+      background-color: #fff2ba;
+      padding: 5px;
+      border-radius: 5px;
+      margin-bottom: 5px;
     }
     .input-title {
       font-weight: bold;
@@ -113,14 +116,12 @@
     </header>
     <main>
       <div class="domain-setting">
-        <label class="input-title" for="domain-text-input"
-          >Preferred instance domain</label
-        >
-        <label class="input-description" for="domain-text-input">
-          Will try to redirect to the communities in your preferred instance.
-          This may not always work (for instance, if your preferred instance
-          blocks the destination instance), and will make navigation a bit
-          slower.
+        <label class="input-title" for="domain-text-input">
+          Preferred instance domain
+        </label>
+        <label class="input-warning" for="domain-text-input">
+          ⚠️ Important: You must be logged in to this community for all redirect
+          functionality to work.
         </label>
         <div class="domain-input-wrapper">
           <input
