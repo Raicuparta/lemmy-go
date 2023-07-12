@@ -53,18 +53,42 @@ function onResetClick() {
   onReady();
 }
 
-async function onSaveClick() {
-  const domain = domainInput.value.trim() || "";
-  if (domain) {
-    setStatus("Validating instance...");
-    try {
-      const federatedInstances = await getFederatedInstances(domain, true);
-      setStatus(`Success!
+async function initializeFederatedInstances(domain: string) {
+  const federatedInstances = await getFederatedInstances(domain, true);
+  setStatus(`Success!
 Blocked instances: ${federatedInstances.blocked.length}
 Linked instances: ${federatedInstances.linked.length}
 Allowed instances: ${federatedInstances.allowed.length}`);
+}
+
+async function onSaveClick() {
+  const domain = domainInput.value.trim() || "";
+  if (domain) {
+    // Some instances have CORS (mis?)configured and will reject requests to their API endpoints.
+    // To make non-cors requests work, we need to ask the browser for extra permissions for this domain.
+    const permissionGranted = await chrome.permissions.request({
+      origins: [`https://${domain}/*`],
+    });
+
+    setStatus("Validating instance...");
+
+    try {
+      await initializeFederatedInstances(domain);
     } catch (error) {
-      setStatus(`Error validating this instance domain: ${error}`);
+      setStatus(
+        `Error validating this instance domain.
+
+${
+  permissionGranted
+    ? ""
+    : `You rejected the request for more permissions, so maybe that's why.
+Try again, but accept the permissions request.`
+}
+
+Error: ${error}`
+      );
+
+      return;
     }
   }
 
