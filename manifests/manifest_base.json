@@ -1,7 +1,7 @@
 {
   "name": "Lemmy Go",
   "description": "Quickly navigate to a Lemmy community from the address bar.",
-  "version": "0.7.1",
+  "version": "0.8.0",
   "manifest_version": 3,
   "background": {
     "type": "module"
