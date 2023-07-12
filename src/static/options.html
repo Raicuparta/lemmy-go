@@ -104,6 +104,10 @@
       border-radius: 5px;
       margin-bottom: 5px;
     }
+    .input-description {
+      font-size: 0.65rem;
+      opacity: 60%;
+    }
     .input-title {
       font-weight: bold;
     }
@@ -118,6 +122,11 @@
       <div class="domain-setting">
         <label class="input-title" for="domain-text-input">
           Preferred instance domain
+        </label>
+        <label class="input-description">
+          ℹ️ Note: It's not always possible to navigate to every community from
+          within your preferred instance. In these cases, Lemmy Go will just
+          navigate directly to that community's instance.
         </label>
         <label class="input-warning" for="domain-text-input">
           ⚠️ Important: You must be logged in to this community for all redirect
@@ -136,9 +145,9 @@
       </div>
       <span>
         <input id="nsfw-checkbox" type="checkbox" />
-        <label for="nsfw-checkbox" class="input-title"
-          >Show communities marked as NSFW</label
-        >
+        <label for="nsfw-checkbox" class="input-title">
+          Show communities marked as NSFW
+        </label>
       </span>
       <div class="form-buttons">
         <button id="save-button" class="save-button button">Save</button>
