@@ -74,7 +74,7 @@ async function onSaveClick() {
       await initializeFederatedInstances(domain);
     } catch (error) {
       setStatus(
-        `Error validating this instance domain.
+        `Failed to get instance information. Instance will still be used, but you might get some errors when navigating.
 ${
   permissionGranted
     ? ""
