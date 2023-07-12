@@ -2,11 +2,17 @@ import { GetFederatedInstancesResponse, Instance } from "lemmy-js-client";
 
 import { clearStorage, getStorage, writeStorage } from "./storage.js";
 import { getFederatedInstances } from "./federated-instances.js";
+import { getCommunities, getFilteredCommunities } from "./communities.js";
 
 const nsfwCheckbox = document.getElementById(
   "nsfw-checkbox"
 ) as HTMLInputElement;
-const domainInput = document.getElementById("domain-input") as HTMLInputElement;
+const domainInput = document.getElementById(
+  "domain-text-input"
+) as HTMLInputElement;
+const domainSelect = document.getElementById(
+  "domain-select"
+) as HTMLSelectElement;
 const saveButton = document.getElementById("save-button") as HTMLButtonElement;
 const resetButton = document.getElementById(
   "reset-button"
@@ -60,8 +66,33 @@ async function restore() {
   if (nsfwCheckbox) {
     nsfwCheckbox.checked = storage.showNsfw;
   }
+
+  const preferredDomain = storage.instanceDomain ?? "";
+
   if (domainInput) {
-    domainInput.value = storage.instanceDomain ?? "";
+    domainInput.value = preferredDomain;
+  }
+
+  if (domainSelect) {
+    domainSelect.onchange = () => {
+      domainInput.value = domainSelect.value;
+    };
+
+    const instanceSet = new Set<string>();
+    for (const community of await getCommunities()) {
+      instanceSet.add(community.domain);
+    }
+
+    const instanceArray = [...instanceSet];
+
+    for (const instance of instanceArray.sort()) {
+      const option = document.createElement("option");
+      option.innerText = instance;
+      option.value = instance;
+      domainSelect.appendChild(option);
+    }
+
+    domainSelect.selectedIndex = instanceArray.indexOf(preferredDomain) + 1;
   }
 }
 
