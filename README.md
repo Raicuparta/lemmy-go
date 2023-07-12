@@ -42,7 +42,7 @@ On Reddit, I had a simple search keyword for navigating directly to subreddits, 
 
 I wanted to have the same behaviour for Lemmy, but the Fediverse makes this a lot more complicated. Even if you're constantly writing the full community name@instance pair, there's still the problem of errors when navigating to blocked instances, or instance links that are broken for whatever reason.
 
-So I made this extension to try and make it as simply as possible to jump to a community, or even find new ones more easily.
+So I made this extension to try and make it as simple as possible to jump to a community, or even find new ones more easily.
 
 ## Why is it kinda slow?
 
