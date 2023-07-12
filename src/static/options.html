@@ -6,7 +6,7 @@
   <style>
     body {
       font-family: sans-serif;
-      font-size: 11px;
+      font-size: 0.8rem;
       margin: 0;
       display: flex;
       flex-direction: column;
@@ -60,23 +60,6 @@
     .button:active {
       background-color: #2e2144;
     }
-    .help {
-      background-color: #3c2c58;
-      color: white;
-      font-weight: bold;
-      margin: 3px;
-      display: inline-block;
-      line-height: 5px;
-      border-radius: 100%;
-      height: 15px;
-      width: 15px;
-      display: inline-flex;
-      justify-content: center;
-      align-items: center;
-    }
-    .help:hover {
-      background-color: #49356b;
-    }
     .domain-setting {
       display: flex;
       flex-direction: column;
@@ -114,6 +97,13 @@
       width: calc(100% - 40px);
       height: 100%;
     }
+    .input-description {
+      opacity: 50%;
+      font-size: 0.65rem;
+    }
+    .input-title {
+      font-weight: bold;
+    }
   </style>
 
   <body>
@@ -123,14 +113,14 @@
     </header>
     <main>
       <div class="domain-setting">
-        <label for="domain-text-input">
-          Preferred instance domain
-          <span
-            class="help"
-            title="Will try to navigate to the community in this instance. Make sure to include only the relevant domain. Example: lemmy.ml"
-          >
-            ?
-          </span>
+        <label class="input-title" for="domain-text-input"
+          >Preferred instance domain</label
+        >
+        <label class="input-description" for="domain-text-input">
+          Will try to redirect to the communities in your preferred instance.
+          This may not always work (for instance, if your preferred instance
+          blocks the destination instance), and will make navigation a bit
+          slower.
         </label>
         <div class="domain-input-wrapper">
           <input
@@ -145,7 +135,9 @@
       </div>
       <span>
         <input id="nsfw-checkbox" type="checkbox" />
-        <label for="nsfw-checkbox">Show communities marked as NSFW</label>
+        <label for="nsfw-checkbox" class="input-title"
+          >Show communities marked as NSFW</label
+        >
       </span>
       <div class="form-buttons">
         <button id="save-button" class="save-button button">Save</button>
