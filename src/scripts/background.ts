@@ -16,6 +16,8 @@ function setUpInitialText() {
   });
 }
 
+// TODO pick a better name for this, "preferred instance" should only be the user-picked one,
+// but this one has a fallback.
 async function getPreferredInstanceUrl() {
   const instanceDomain = (
     (await getStorageValue("instanceDomain")) || fallbackInstanceDomain
@@ -36,17 +38,49 @@ async function getCommunityUrl(community: Community) {
     : community.url;
 }
 
+async function isCommunityAvailableInPreferredInstance(communityId: string) {
+  const preferredInstanceDomain = await getStorageValue("instanceDomain");
+  const result = await fetch(
+    `https://${preferredInstanceDomain}/api/v3/community?name=${communityId}`
+  );
+  return result.ok;
+}
+
 export async function getUrlFromText(text: string) {
   const [name, domain] = text.split("@");
 
   if (domain) {
-    const instanceDomain = await getStorageValue("instanceDomain");
-    if (
-      (await isInstanceFederated(domain)) &&
-      instanceDomain &&
-      instanceDomain !== domain
-    ) {
-      return `https://${instanceDomain}/c/${name}@${domain}`;
+    const preferredInstance = await getStorageValue("instanceDomain");
+
+    if (await isInstanceFederated(domain)) {
+      const communityId = `${name}@${domain}`;
+      const communityUrl = `https://${preferredInstance}/c/${communityId}`;
+
+      if (!(await isCommunityAvailableInPreferredInstance(communityId))) {
+        // If the preferred instance federates with this community's instance,
+        // but the community isn't active in the preferred instance,
+        // navigating to that community on our preferred instance will throw an error,
+        // but this will also trigger the activation of this community on our preferred instance.
+        // So we navigate there once in a background tab, and then later navigate again,
+        // to the hopefully now active community.
+        console.log(
+          `Activating community by opening ${communityUrl} in the background`
+        );
+        const tab = await navigateTo(communityUrl, "newBackgroundTab");
+        await new Promise((resolve, reject) => {
+          chrome.tabs.onUpdated.addListener(function onTabUpdated(
+            tabId: number
+          ) {
+            if (tab.id !== tabId) return;
+
+            chrome.tabs.onUpdated.removeListener(onTabUpdated);
+            chrome.tabs.remove(tab.id);
+            resolve(null);
+          });
+        });
+      }
+
+      return communityUrl;
     } else {
       return `https://${domain}/c/${name}`;
     }
@@ -91,20 +125,34 @@ chrome.omnibox.onInputChanged.addListener(async (text, suggest) => {
   );
 });
 
-chrome.omnibox.onInputEntered.addListener(async (text, disposition) => {
-  const url = await getUrlFromText(text);
-
+async function navigateTo(
+  url: string,
+  disposition: chrome.omnibox.OnInputEnteredDisposition
+) {
   switch (disposition) {
     case "currentTab":
-      chrome.tabs.update({ url });
-      break;
+      return await chrome.tabs.update({ url });
     case "newForegroundTab":
-      chrome.tabs.create({ url });
-      break;
+      return await chrome.tabs.create({ url });
     case "newBackgroundTab":
-      chrome.tabs.create({ url, active: false });
-      break;
+      return await chrome.tabs.create({ url, active: false });
   }
+}
+
+chrome.omnibox.onInputEntered.addListener(async (text, disposition) => {
+  console.log(`Entered text: ${text}`);
+  const url = await getUrlFromText(text);
+  console.log(`Text resulted in URL: ${url}`);
+
+  const tab = await navigateTo(url, disposition);
+  chrome.tabs.onUpdated.addListener(function onTabUpdated(tabId: number) {
+    if (tab.id !== tabId) return;
+
+    chrome.tabs.onUpdated.removeListener(onTabUpdated);
+    if (tab.status === "complete") {
+      navigateTo(url, disposition);
+    }
+  });
 });
 
 chrome.action.onClicked.addListener(function () {

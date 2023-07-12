@@ -1,5 +1,7 @@
 import { GetFederatedInstancesResponse, Instance } from "lemmy-js-client";
 
+import { getStorageValue } from "./storage.js";
+
 const defaultFederatedInstances = {
   linked: [] as string[],
   allowed: [] as string[],
@@ -43,11 +45,16 @@ async function updateFederatedInstancesCache(domain: string) {
     throw new Error("Empty response when trying to get federated instances");
   }
 
-  setCachedFederatedInstances({
+  const cache = {
     allowed: instancesToDomains(federatedInstances.allowed),
     linked: instancesToDomains(federatedInstances.linked),
     blocked: instancesToDomains(federatedInstances.blocked),
-  });
+  };
+
+  setCachedFederatedInstances(cache);
+
+  console.log("Successfully updated federated instances cache");
+  return cache;
 }
 
 export async function getFederatedInstances(
@@ -58,7 +65,7 @@ export async function getFederatedInstances(
 
   if (!cachedFederatedInstances || ignoreCache) {
     console.log("Federated instances cache is empty, waiting for result.");
-    await updateFederatedInstancesCache(domain);
+    return await updateFederatedInstancesCache(domain);
   } else {
     console.log(
       "Federated instances cache is present, updating in the background."
@@ -70,18 +77,23 @@ export async function getFederatedInstances(
   return cachedFederatedInstances;
 }
 
-export async function isInstanceFederated(instanceDomain: string) {
-  const federatedInstances = await getFederatedInstances(instanceDomain);
+export async function isInstanceFederated(remoteInstance: string) {
+  const preferredInstance = await getStorageValue("instanceDomain");
+  if (!preferredInstance || preferredInstance === remoteInstance) {
+    return true;
+  }
+
+  const federatedInstances = await getFederatedInstances(preferredInstance);
 
   if (
-    federatedInstances.blocked.find((instance) => instance === instanceDomain)
+    federatedInstances.blocked.find((instance) => instance === remoteInstance)
   ) {
     return false;
   }
 
   if (
     ![...federatedInstances.allowed, ...federatedInstances.linked].find(
-      (instance) => instance === instanceDomain
+      (instance) => instance === remoteInstance
     )
   ) {
     return false;
