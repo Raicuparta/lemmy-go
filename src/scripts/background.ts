@@ -29,11 +29,7 @@ async function getPreferredInstanceUrl() {
 }
 
 async function getCommunityUrl(community: Community) {
-  const instanceDomain = await getStorageValue("instanceDomain");
-
-  return (await isInstanceFederated(community.domain)) &&
-    instanceDomain &&
-    instanceDomain !== community.domain
+  return (await isInstanceFederated(community.domain))
     ? `${await getPreferredInstanceUrl()}/c/${getCommunityId(community)}`
     : community.url;
 }

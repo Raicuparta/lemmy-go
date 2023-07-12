@@ -80,7 +80,7 @@ export async function getFederatedInstances(
 export async function isInstanceFederated(remoteInstance: string) {
   const preferredInstance = await getStorageValue("instanceDomain");
   if (!preferredInstance || preferredInstance === remoteInstance) {
-    return true;
+    return false;
   }
 
   const federatedInstances = await getFederatedInstances(preferredInstance);
