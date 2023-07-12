@@ -12,9 +12,9 @@
 
 Type `lg` followed by a space (some browsers also accept tab instead), and then type the name of the community you're looking for.
 
-Example: `lg firefox`
+Example: `lg linux`
 
-Lemmy Go will search its database for any community that has the text `firefox` in its name (e.g. `linux_gaming`) or title (`Linux Gaming`).
+Lemmy Go will search its database for any community that has the text `linux` in its name (e.g. `linux_gaming`) or title (`Linux Gaming`).
 
 If you just type a community name and press enter, Lemmy Go will take you to the most popular community from that list.
 
