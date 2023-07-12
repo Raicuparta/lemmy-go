@@ -63,6 +63,7 @@ export async function getUrlFromText(text: string) {
         // but this will also trigger the activation of this community on our preferred instance.
         // So we navigate there once in a background tab, and then later navigate again,
         // to the hopefully now active community.
+        // Sorry, I hate it too.
         console.log(
           `Activating community by opening ${communityUrl} in the background`
         );
