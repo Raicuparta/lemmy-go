@@ -5,15 +5,26 @@
   </head>
   <style>
     body {
-      font-family: sans-serif;
-      color: #3c2c58;
+      color: #eee;
+      background: #121212;
       font-size: 0.8rem;
       margin: 0;
       display: flex;
       flex-direction: column;
       gap: 10px;
       width: 300px;
-      background: #efeaf8;
+      font-family: system-ui;
+    }
+    a {
+      color: #809fff;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    code {
+      font-size: 1.2em;
+      color: #888;
+      user-select: text;
     }
     h1 {
       margin: 0;
@@ -23,14 +34,13 @@
       padding: 0 10px;
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 15px;
     }
     header,
     footer {
-      background-color: #c7b4e9;
+      background-color: #252525;
       padding: 10px;
       display: flex;
-      font-size: 0.6rem;
       gap: 10px;
       opacity: 80%;
     }
@@ -41,28 +51,17 @@
       justify-content: center;
       align-items: center;
     }
-    .button {
-      text-decoration: none;
-      color: white;
-      background-color: #3c2c58;
-      padding: 5px 10px;
-      border-radius: 5px;
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      border: 0;
-      cursor: pointer;
-      justify-content: center;
+    select {
+      height: 30px;
+      width: 100%;
     }
-    .button:hover {
-      background-color: #49356b;
-    }
-    .button:active {
-      background-color: #2e2144;
+    label {
+      font-weight: bold;
     }
     .domain-setting {
       display: flex;
       flex-direction: column;
+      gap: 5px;
     }
     .form-buttons {
       margin-top: 10px;
@@ -80,9 +79,6 @@
       width: 16px;
       height: 16px;
     }
-    code {
-      user-select: text;
-    }
     .domain-input-wrapper {
       position: relative;
       height: 30px;
@@ -98,21 +94,13 @@
     }
     .input-warning {
       font-size: 0.65rem;
-      background-color: #fff2ba;
+      background-color: #554a18;
       padding: 5px;
       border-radius: 5px;
-      margin-bottom: 5px;
     }
     .input-description {
       font-size: 0.65rem;
       opacity: 60%;
-    }
-    .input-title {
-      font-weight: bold;
-    }
-    select {
-      height: 30px;
-      width: 100%;
     }
   </style>
 
@@ -126,10 +114,10 @@
         <label class="input-title" for="domain-text-input">
           Preferred instance domain
         </label>
-        <label class="input-warning" for="domain-text-input">
+        <div class="input-warning">
           ⚠️ Important: You must be logged in to this community for all redirect
           functionality to work.
-        </label>
+        </div>
         <div class="domain-input-wrapper">
           <input
             id="domain-text-input"
@@ -140,11 +128,11 @@
             <option value="">None</option>
           </select>
         </div>
-        <label class="input-description">
+        <div class="input-description">
           Note: It's not always possible to navigate to every community from
           within your preferred instance. In these cases, Lemmy Go will just
           navigate directly to that community's instance.
-        </label>
+        </div>
       </div>
       <div>
         <label class="input-title"> Sort communities by</label>
