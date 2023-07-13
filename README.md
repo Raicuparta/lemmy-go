@@ -1,6 +1,6 @@
 # Lemmy Go
 
-[Lemmy Go](https://lemmy.raicuparta.com) is a extension that adds a new search keyword (`lg`) for more easily navigating to Lemmy communities.
+[Lemmy Go](https://lemmy.raicuparta.com) is a browser extension that adds a new search keyword (`lg`) for more easily navigating to Lemmy communities.
 
 ## Install
 
