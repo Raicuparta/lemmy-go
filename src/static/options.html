@@ -88,7 +88,6 @@
       height: 30px;
     }
     .domain-select {
-      width: 100%;
       height: 100%;
     }
     .domain-text-input {
@@ -110,6 +109,10 @@
     }
     .input-title {
       font-weight: bold;
+    }
+    select {
+      height: 30px;
+      width: 100%;
     }
   </style>
 
@@ -150,7 +153,7 @@
         </label>
       </div>
       <div>
-        <label> Sort communities by: </label>
+        <label class="input-title"> Sort communities by: </label>
         <select id="sort-select">
           <option value="subscribers">Subscribers</option>
           <option value="monthlyActiveUsers">Active users per month</option>
