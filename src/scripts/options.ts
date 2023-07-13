@@ -101,6 +101,7 @@ Error: ${error}`
 }
 
 async function setUpSortSetting() {
+  sortSelect.selectedIndex = 0;
   const sortBy = await getStorageValue("sortBy");
   for (let i = 0; i <= sortSelect.options.length; i++) {
     if (sortSelect.options.item(i)?.value === sortBy) {
