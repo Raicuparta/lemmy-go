@@ -143,12 +143,19 @@
           </select>
         </div>
       </div>
-      <span>
+      <div>
         <input id="nsfw-checkbox" type="checkbox" />
         <label for="nsfw-checkbox" class="input-title">
           Show communities marked as NSFW
         </label>
-      </span>
+      </div>
+      <div>
+        <label> Sort communities by: </label>
+        <select id="sort-select">
+          <option value="subscribers">Subscribers</option>
+          <option value="monthlyActiveUsers">Active users per month</option>
+        </select>
+      </div>
       <div class="form-buttons">
         <button id="save-button" class="save-button button">Save</button>
         <button id="reset-button" class="reset-button button">Reset</button>

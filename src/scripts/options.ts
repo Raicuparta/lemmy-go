@@ -1,6 +1,6 @@
 import { clearStorage, getStorageValue, writeStorage } from "./storage.js";
 import { getBlockedInstances } from "./federated-instances.js";
-import { getCommunities } from "./communities.js";
+import { SortOption, getCommunities } from "./communities.js";
 import { getElement } from "./get-element.js";
 
 const nsfwCheckbox = getElement<HTMLInputElement>("nsfw-checkbox");
@@ -9,6 +9,7 @@ const domainSelect = getElement<HTMLSelectElement>("domain-select");
 const saveButton = getElement<HTMLButtonElement>("save-button");
 const resetButton = getElement<HTMLButtonElement>("reset-button");
 const statusText = getElement<HTMLInputElement>("status-text");
+const sortSelect = getElement<HTMLSelectElement>("sort-select");
 
 function setStatus(text: string) {
   if (!statusText) {
@@ -90,7 +91,8 @@ Error: ${error}`
 
   writeStorage({
     showNsfw: nsfwCheckbox && nsfwCheckbox.checked,
-    instanceDomain: domainInput?.value?.trim() || "",
+    instanceDomain: domainInput.value.trim() || "",
+    sortBy: sortSelect.value as SortOption,
   });
 
   if (!domain) {
@@ -98,9 +100,20 @@ Error: ${error}`
   }
 }
 
+async function setUpSortSetting() {
+  const sortBy = await getStorageValue("sortBy");
+  for (let i = 0; i <= sortSelect.options.length; i++) {
+    if (sortSelect.options.item(i)?.value === sortBy) {
+      sortSelect.selectedIndex = i;
+      return;
+    }
+  }
+}
+
 async function onReady() {
   setUpNsfwSetting();
   setUpDomainSetting();
+  setUpSortSetting();
   resetButton.onclick = onResetClick;
   saveButton.onclick = onSaveClick;
 }

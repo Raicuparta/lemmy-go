@@ -1,13 +1,16 @@
+import { SortOption } from "./communities";
+
 const defaultValues = {
   showNsfw: false,
   instanceDomain: "",
+  sortBy: "subscriptions" as SortOption,
 };
 
 type AppStorage = typeof defaultValues;
 type StorageKey = keyof AppStorage;
 
 export async function getStorage() {
-  return (await chrome.storage.local.get(
+  return (await chrome.storage.sync.get(
     Object.keys(defaultValues)
   )) as AppStorage;
 }
@@ -20,9 +23,9 @@ export async function getStorageValue<K extends StorageKey>(
 }
 
 export async function writeStorage(values: Partial<AppStorage>) {
-  await chrome.storage.local.set(values);
+  await chrome.storage.sync.set(values);
 }
 
 export async function clearStorage() {
-  chrome.storage.local.clear();
+  chrome.storage.sync.clear();
 }

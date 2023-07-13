@@ -150,10 +150,12 @@ chrome.omnibox.onInputChanged.addListener(async (text, suggest) => {
   }
 
   suggest(
-    filteredCommunities.map((community) => ({
-      content: formatContent(getCommunityId(community)),
-      description: formatCommunity(community),
-    }))
+    await Promise.all(
+      filteredCommunities.map(async (community) => ({
+        content: formatContent(getCommunityId(community)),
+        description: await formatCommunity(community),
+      }))
+    )
   );
 });
 

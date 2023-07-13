@@ -11,6 +11,10 @@ export interface Community {
   title: string;
 }
 
+export type SortOption = {
+  [K in keyof Community]: Community[K] extends number ? K : never;
+}[keyof Community];
+
 const apiUrl = "https://lemmy.raicuparta.com/communities.json";
 
 let communities: Community[] = [];
@@ -20,8 +24,10 @@ export async function setUpCommunities() {
 
   const communitiesJson = (await result.json()) as Community[];
 
+  const sortKey = await getStorageValue("sortBy");
+
   communities = communitiesJson.sort(
-    (communityA, communityB) => communityB.subscribers - communityA.subscribers
+    (communityA, communityB) => communityB[sortKey] - communityA[sortKey]
   );
 }
 
@@ -33,10 +39,12 @@ export async function getCommunities() {
   return communities;
 }
 
-export const formatCommunity = (community: Community) =>
-  `${escapeOmniboxString(community.title)} (${getCommunityId(community)}, ${
-    community.subscribers
-  } subs)`;
+export async function formatCommunity(community: Community) {
+  const sortBy = await getStorageValue("sortBy");
+  return `${escapeOmniboxString(community.title)} (${getCommunityId(
+    community
+  )}, ${community[sortBy]} ${sortBy})`;
+}
 
 export async function getFilteredCommunities(text: string) {
   if (communities.length === 0) {
